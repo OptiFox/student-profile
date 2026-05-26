@@ -63,10 +63,10 @@
                             response.sendRedirect("supervisor_dashboard.jsp");
                         }
                     } else {
-                        out.println("<p class='error-text'>Invalid username or password.</p>");
+                        out.println("<p class='error-text'>Ralat: Username atau password tidak sah.</p>");
                     }
                 } catch (Exception e) {
-                    out.println("Error: " + e.getMessage());
+                    out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
                 } finally {
                     if (rs != null) rs.close();
                     if (stmt != null) stmt.close();

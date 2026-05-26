@@ -41,7 +41,9 @@
                 <legend><b>Menu Utama</b></legend>
                 <ul class="btn">
                     <li style="margin-bottom: 10px;">
-                        <button class="btn-primary" style="width: 250px;">Urus Guru Penasihat</button>
+                        <a href="admin/manage_supervisors.jsp">
+                            <button class="btn-primary" style="width: 250px;">Urus Guru Penasihat</button>
+                        </a>
                     </li>
                     <li style="margin-bottom: 10px;">
                         <button class="btn-primary" style="width: 250px;">Urus Senarai Acara / Pertandingan</button>

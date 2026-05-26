@@ -15,29 +15,33 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     margin: 10px 0 0 0;
 }
 
+.success-text {
+    color: green;
+    text-align: center;
+    margin: 10px 0 0 0;
+}
+
 .btn-danger {
     text-decoration: none;
-    background: red;
+    background-color: red;
     color: white;
-    border: 2px solid white;
     border-radius: 8px;
     padding: 8px;
-    height: fit-content;
 }
 
 .btn-primary {
+    text-decoration: none;
     background: #3399ff;
     color: white;
     border-radius: 8px;
-    border: 2px solid black;
     padding: 8px;
 }
 
 .btn-secondary {
+    text-decoration: none;
     background: #666666;
     color: white;
     border-radius: 8px;
-    border: 2px solid black;
     padding: 8px;
 }
 
@@ -63,4 +67,22 @@ fieldset {
 ul.btn {
     list-style-type: none; 
     padding: 0;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+    height: fit-content;
+    width: fit-content;
+    padding: 8px;
+}
+
+#searchInput {
+    width: 100%; 
+    padding: 10px; 
+    border-radius: 4px; 
+    border: 1px solid #ccc;
 }

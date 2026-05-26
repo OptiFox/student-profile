@@ -5,13 +5,36 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%
+    // check for supervisor role
+    String currentUser = (String) session.getAttribute("username");
+    String currentRole = (String) session.getAttribute("userRole");
+    
+    if (currentUser == null || !"SUPERVISOR".equals(currentRole)) {
+        response.sendRedirect("login.jsp");
+        return; // stop page from loading
+    }
+%>
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <link rel="stylesheet" href="css/style.css">
+        
+        <title>SPIS - Supervisor Dashboard</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <header class="flex">
+            <h1>Sistem Profil Pelajar (SPIS) - Modul Guru Penasihat</h1>
+            
+            <a href="logout.jsp" class="btn-danger">Log Keluar</a>
+        </header>
+        
+        <main>
+            <h2>Selamat Datang, Guru Penasihat (<%= currentUser %>)</h2>
+            <p>Modul pengurusan pelajar dan kehadiran akan diletakkan di sini.</p>
+        </main>
     </body>
 </html>
