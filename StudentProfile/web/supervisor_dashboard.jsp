@@ -34,7 +34,18 @@
         
         <main>
             <h2>Selamat Datang, Guru Penasihat (<%= currentUser %>)</h2>
-            <p>Modul pengurusan pelajar dan kehadiran akan diletakkan di sini.</p>
+            <p>Sila pilih pengurusan di bawah:</p>
+            
+            <fieldset>
+                <legend><b>Menu Utama</b></legend>
+                <ul class="btn">
+                    <li>
+                        <a href="supervisor/add_student.jsp">
+                            <button class="btn-primary" style="width: 250px;">Tambah Pelajar Baharu</button>
+                        </a>
+                    </li>
+                </ul>
+            </fieldset>
         </main>
     </body>
 </html>

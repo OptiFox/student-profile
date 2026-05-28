@@ -42,12 +42,12 @@
                 
                 <form action="manage_events.jsp" method="post">
                     <p>
-                        <label for="eventName">Nama Acara:</label><br>
+                        <label for="eventName">Nama Acara:</label>
                         <input type="text" id="eventName" name="eventName" required>
                     </p>
             
                     <p>
-                        <label for="eventType">Kategori:</label><br>
+                        <label for="eventType">Kategori:</label>
                         <select id="eventType" name="eventType" required>
                             <option value="Unit Beruniform">Unit Beruniform</option>
                             <option value="Kelab & Persatuan">Kelab & Persatuan</option>
@@ -56,12 +56,12 @@
                     </p>
                     
                     <p>
-                        <label for="eventDate">Tarikh:</label><br>
+                        <label for="eventDate">Tarikh:</label>
                         <input type="date" id="eventDate" name="eventDate" required>
                     </p>
                     
                     <p>
-                        <label for="description">Penerangan ringkas:</label><br>
+                        <label for="description">Penerangan ringkas:</label>
                         <textarea id="description" name="description" rows="3" style="width: 100%;"></textarea>
                     </p>
             

@@ -11,12 +11,14 @@ function filterTable() {
     let tr = table.getElementsByTagName("tr");
 
     for (let i = 1; i < tr.length; i++) {
-        let td = tr[i].getElementsByTagName("td")[1];
+        let tdName = tr[i].getElementsByTagName("td")[1];
+        let tdMyKid = tr[i].getElementsByTagName("td")[2];
                 
-        if (td) {
-            let txtValue = td.textContent;
+        if (tdName || tdMyKid) {
+            let txtName = tdName.textContent;
+            let txtMyKid = tdMyKid.textContent;
 
-            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+            if (txtName.toLowerCase().indexOf(filter) > -1 || txtMyKid.toLowerCase().indexOf(filter) > -1) {
                 tr[i].style.display = "";
             } else {
                 tr[i].style.display = "none";

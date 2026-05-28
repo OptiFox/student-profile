@@ -69,9 +69,14 @@ ul.btn {
     padding: 0;
 }
 
+ul.btn > li {
+    margin-bottom: 10px;
+}
+
 table {
     border-collapse: collapse;
     width: 100%;
+    text-align: left;
 }
 
 th, td {
@@ -90,4 +95,15 @@ th, td {
 
 input {
     width: 100%;
+}
+
+input[type="radio"] {
+    margin: 0 4px 0 0;
+    width: revert;
+}
+
+label {
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
 }

@@ -40,18 +40,20 @@
             <fieldset>
                 <legend><b>Menu Utama</b></legend>
                 <ul class="btn">
-                    <li style="margin-bottom: 10px;">
+                    <li>
                         <a href="admin/manage_supervisors.jsp">
                             <button class="btn-primary" style="width: 250px;">Urus Guru Penasihat</button>
                         </a>
                     </li>
-                    <li style="margin-bottom: 10px;">
+                    <li>
                         <a href="admin/manage_events.jsp">
                             <button class="btn-primary" style="width: 250px;">Urus Senarai Acara / Pertandingan</button>
                         </a>
                     </li>
-                    <li style="margin-bottom: 10px;">
-                        <button class="btn-secondary" style="width: 250px;">Papar Keseluruhan Pelajar</button>
+                    <li>
+                        <a href="admin/view_all_students.jsp">
+                            <button class="btn-secondary" style="width: 250px;">Papar Keseluruhan Pelajar</button>
+                        </a>
                     </li>
                 </ul>
             </fieldset>
