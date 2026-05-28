@@ -23,7 +23,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 .btn-danger {
     text-decoration: none;
-    background-color: red;
+    background: red;
     color: white;
     border-radius: 8px;
     padding: 8px;
@@ -71,6 +71,7 @@ ul.btn {
 
 table {
     border-collapse: collapse;
+    width: 100%;
 }
 
 th, td {
@@ -85,4 +86,8 @@ th, td {
     padding: 10px; 
     border-radius: 4px; 
     border: 1px solid #ccc;
+}
+
+input {
+    width: 100%;
 }

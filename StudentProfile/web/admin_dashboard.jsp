@@ -46,7 +46,9 @@
                         </a>
                     </li>
                     <li style="margin-bottom: 10px;">
-                        <button class="btn-primary" style="width: 250px;">Urus Senarai Acara / Pertandingan</button>
+                        <a href="admin/manage_events.jsp">
+                            <button class="btn-primary" style="width: 250px;">Urus Senarai Acara / Pertandingan</button>
+                        </a>
                     </li>
                     <li style="margin-bottom: 10px;">
                         <button class="btn-secondary" style="width: 250px;">Papar Keseluruhan Pelajar</button>

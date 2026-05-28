@@ -4,8 +4,16 @@
         <servlet-name>DeleteSupervisorServlet</servlet-name>
         <servlet-class>DeleteSupervisorServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeleteEventServlet</servlet-name>
+        <servlet-class>DeleteEventServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DeleteSupervisorServlet</servlet-name>
         <url-pattern>/DeleteSupervisorServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteEventServlet</servlet-name>
+        <url-pattern>/DeleteEventServlet</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -1,6 +1,6 @@
 <%-- 
-    Document   : manage_supervisors
-    Created on : May 26, 2026, 10:29:39 PM
+    Document   : manage_events
+    Created on : May 28, 2026, 9:12:15 AM
     Author     : daniel
 --%>
 
@@ -24,11 +24,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="../css/style.css">
         
-        <title>SPIS - Urus Guru Penasihat</title>
+        <title>SPIS - Urus Senarai Acara & Pertandingan</title>
     </head>
     <body>
         <header class="flex">
-            <h1>Sistem Profil Pelajar (SPIS) - Pendaftaran Guru Penasihat</h1>
+            <h1>Sistem Profil Pelajar (SPIS) - Pengurusan Acara & Pertandingan</h1>
             
             <div>
                 <a href="../admin_dashboard.jsp" class="btn-secondary">Kembali</a>
@@ -38,22 +38,42 @@
         
         <main>
             <fieldset>
-                <legend>Daftar Guru Baharu</legend>
+                <legend>Tambah Acara Baharu</legend>
                 
-                <form action="manage_supervisors.jsp" method="post">
-                    <label for="newUsername">Username:</label>
-                    <input type="text" id="newUsername" name="newUsername" required>
+                <form action="manage_events.jsp" method="post">
+                    <p>
+                        <label for="eventName">Nama Acara:</label><br>
+                        <input type="text" id="eventName" name="eventName" required>
+                    </p>
             
-                    <label for="password">Password:</label>
-                    <input type="password" id="newPassword" name="newPassword" required>
+                    <p>
+                        <label for="eventType">Kategori:</label><br>
+                        <select id="eventType" name="eventType" required>
+                            <option value="Unit Beruniform">Unit Beruniform</option>
+                            <option value="Kelab & Persatuan">Kelab & Persatuan</option>
+                            <option value="Sukan & Permainan">Sukan & Permainan</option>
+                        </select>
+                    </p>
+                    
+                    <p>
+                        <label for="eventDate">Tarikh:</label><br>
+                        <input type="date" id="eventDate" name="eventDate" required>
+                    </p>
+                    
+                    <p>
+                        <label for="description">Penerangan ringkas:</label><br>
+                        <textarea id="description" name="description" rows="3" style="width: 100%;"></textarea>
+                    </p>
             
-                    <button type="submit">Daftar Guru</button>
+                    <button type="submit" class="btn-primary">Tambah Acara</button>
                 </form>
             
             <%
             if ("POST".equalsIgnoreCase(request.getMethod())) {
-                String usernameInput = request.getParameter("newUsername");
-                String passwordInput = request.getParameter("newPassword");
+                String eventName = request.getParameter("eventName");
+                String eventType = request.getParameter("eventType");
+                String eventDate = request.getParameter("eventDate");
+                String description = request.getParameter("description");
                 
                 Connection conn = null;
                 PreparedStatement stmt = null;
@@ -63,19 +83,19 @@
                     conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
                     
                     // SUPERVISOR role is hardcoded so that admin doesn't have to type
-                    String query = "INSERT INTO Users (username, password, role) VALUES (?, ?, 'SUPERVISOR')";
+                    String query = "INSERT INTO Events (event_name, event_type, event_date, description) VALUES (?, ?, ?, ?)";
                 
                     stmt = conn.prepareStatement(query);
-                    stmt.setString(1, usernameInput);
-                    stmt.setString(2, passwordInput);
+                    stmt.setString(1, eventName);
+                    stmt.setString(2, eventType);
+                    stmt.setDate(3, java.sql.Date.valueOf(eventDate));
+                    stmt.setString(4, description);
                 
                     int rowsAffected = stmt.executeUpdate();
                     
                     if (rowsAffected > 0) {
-                        out.println("<p class='success-text'>Pendaftaran berjaya! Akaun guru sedia untuk digunakan.</p>");
+                        out.println("<p class='success-text'>Acara berjaya ditambah!</p>");
                     }
-                } catch (SQLIntegrityConstraintViolationException e) {
-                    out.println("<p class='error-text'>Ralat: Username ini telah wujud.</p>");
                 } catch (Exception e) {
                     out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
                 } finally {
@@ -86,16 +106,18 @@
             %>
             </fieldset>
             
+            <br>
             <fieldset style="margin-bottom: 15px; width: 100%;">
-                <label for="searchInput"><b>Carian Guru:</b></label>
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari username...">
+                <label for="searchInput"><b>Carian Acara:</b></label>
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama acara...">
             
                 <table id="table">
-                    <caption>Direktori Pengguna Sistem</caption>
+                    <caption>Senarai Keseluruhan Acara & Pertandingan</caption>
                     <tr>
                         <th>ID</th>
-                        <th>Username</th>
-                        <th>Role</th>
+                        <th>Nama Acara</th>
+                        <th>Kategori</th>
+                        <th>Tarikh</th>
                         <th>Tindakan</th>
                     </tr>
                 <%
@@ -106,19 +128,21 @@
                     try {
                         Class.forName("org.apache.derby.jdbc.ClientDriver"); // fix retrieve db failed
                         conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                        String query = "SELECT * FROM Users WHERE role = 'SUPERVISOR'";
+                        String query = "SELECT * FROM Events ORDER BY event_date DESC";
                         stmt = conn.prepareStatement(query);
                         rs = stmt.executeQuery();
+                        
                         // Iterate over the result set and display each record
                         while (rs.next()) {
                 %>
                         <tr>
-                            <td><%= rs.getInt("user_id") %></td>
-                            <td><%= rs.getString("username") %></td>
-                            <td><%= rs.getString("role") %></td>
+                            <td><%= rs.getInt("event_id") %></td>
+                            <td><%= rs.getString("event_name") %></td>
+                            <td><%= rs.getString("event_type") %></td>
+                            <td><%= rs.getDate("event_date") %></td>
                             <td>
-                                <a href="../DeleteSupervisorServlet?id=<%= rs.getInt("user_id") %>"
-                                   onclick="return confirm('Padam pengguna ini?');"
+                                <a href="../DeleteEventServlet?id=<%= rs.getInt("event_id") %>"
+                                   onclick="return confirm('Padam acara ini?');"
                                    class="btn-danger">
                                    Padam
                                 </a>
@@ -137,7 +161,7 @@
                 </table>
             </fieldset>
         </main>
-            
+                
         <script src="../js/search.js"></script>
     </body>
 </html>

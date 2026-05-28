@@ -20,8 +20,8 @@ import java.sql.PreparedStatement;
  *
  * @author daniel
  */
-@WebServlet(name = "DeleteSupervisorServlet", urlPatterns = {"/DeleteSupervisorServlet"})
-public class DeleteSupervisorServlet extends HttpServlet {
+@WebServlet(name = "DeleteEventServlet", urlPatterns = {"/DeleteEventServlet"})
+public class DeleteEventServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,10 +43,9 @@ public class DeleteSupervisorServlet extends HttpServlet {
                 return;
             }
             
-            // Checks if the user is admin or not (security)
             String currentUser = (String) session.getAttribute("username");
             String currentRole = (String) session.getAttribute("userRole");
-    
+            
             if (currentUser == null || !"ADMIN".equals(currentRole)) {
                 response.sendRedirect("login.jsp");
                 return;
@@ -61,13 +60,13 @@ public class DeleteSupervisorServlet extends HttpServlet {
                 Class.forName("org.apache.derby.jdbc.ClientDriver");
                 conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
                 
-                String query = "DELETE FROM Users WHERE user_id = ?";
+                String query = "DELETE FROM Events WHERE event_id = ?";
                 
                 stmt = conn.prepareStatement(query);
                 
                 stmt.setInt(1, id);
                 stmt.executeUpdate();
-                response.sendRedirect("admin/manage_supervisors.jsp");
+                response.sendRedirect("admin/manage_events.jsp");
             } catch (Exception e) {
                 response.getWriter().println("Error: " + e.getMessage());
             } finally {
