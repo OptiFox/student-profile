@@ -11,7 +11,7 @@
     String currentUser = (String) session.getAttribute("username");
     String currentRole = (String) session.getAttribute("userRole");
     
-    if (currentUser == null || !"SUPERVISOR".equals(currentRole)) {
+    if (currentUser == null || !"ADMIN".equals(currentRole)) {
         response.sendRedirect("../login.jsp");
         return;
     }
@@ -29,7 +29,7 @@
         <header class="flex">
             <h1>SPIS - Modul Guru Penasihat</h1>
             <div>
-                <a href="../supervisor_dashboard.jsp" class="btn-secondary">Kembali</a>
+                <a href="../admin_dashboard.jsp" class="btn-secondary">Kembali</a>
                 <a href="../logout.jsp" class="btn-danger">Log Keluar</a>
             </div>
         </header>
