@@ -40,8 +40,8 @@
                 <legend><b>Menu Utama</b></legend>
                 <ul class="btn">
                     <li>
-                        <a href="supervisor/add_student.jsp">
-                            <button class="btn-primary" style="width: 250px;">Tambah Pelajar Baharu</button>
+                        <a href="supervisor/take_attendance.jsp">
+                            <button class="btn-primary" style="width: 250px;">Kemaskini Kehadiran</button>
                         </a>
                     </li>
                 </ul>

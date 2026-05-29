@@ -42,7 +42,7 @@
                     Class.forName("org.apache.derby.jdbc.ClientDriver");
                     conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
                     
-                    String query = "SELECT role FROM Users WHERE username = ? AND password = ?";
+                    String query = "SELECT role, assigned_unit FROM Users WHERE username = ? AND password = ?";
                 
                     stmt = conn.prepareStatement(query);
                     stmt.setString(1, usernameInput);
@@ -52,9 +52,11 @@
                 
                     if (rs.next()) {
                         String userRole = rs.getString("role");
+                        String userUnit = rs.getString("assigned_unit");
                         
                         session.setAttribute("username", usernameInput);
                         session.setAttribute("userRole", userRole);
+                        session.setAttribute("assignedUnit", userUnit);
                     
                         // Only admin can access admin dashboard
                         if ("ADMIN".equals(userRole)) {

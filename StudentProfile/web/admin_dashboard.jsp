@@ -51,6 +51,11 @@
                         </a>
                     </li>
                     <li>
+                        <a href="admin/add_student.jsp">
+                            <button class="btn-primary" style="width: 250px;">Daftar Pelajar Baharu</button>
+                        </a>
+                    </li>
+                    <li>
                         <a href="admin/view_all_students.jsp">
                             <button class="btn-secondary" style="width: 250px;">Papar Keseluruhan Pelajar</button>
                         </a>

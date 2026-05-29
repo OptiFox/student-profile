@@ -37,7 +37,7 @@
         <main>
             <fieldset style="margin-bottom: 15px; width: 100%;">
                 <label for="searchInput"><b>Carian Pelajar:</b></label>
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari Nama atau MyKid...">
+                <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 2)" placeholder="Cari Nama atau MyKid...">
 
                 <table id="table">
                     <caption>Pangkalan Data Pelajar Keseluruhan</caption>

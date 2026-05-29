@@ -2,9 +2,11 @@ DROP TABLE Users;
 
 CREATE TABLE Users (
     user_id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) PRIMARY KEY,
-    username VARCHAR(50) UNIQUE,
-    password VARCHAR(50),
-    role VARCHAR(20)
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    assigned_category VARCHAR(50),
+    assigned_unit VARCHAR(50)
 );
 
 INSERT INTO Users (username, password, role) 
@@ -33,4 +35,17 @@ CREATE TABLE Students (
     uniform_unit VARCHAR(50),
     club VARCHAR(50),
     sport VARCHAR(50)
+);
+
+DROP TABLE Attendance;
+
+CREATE TABLE Attendance (
+    attendance_id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) PRIMARY KEY,
+    student_id INT NOT NULL,
+    unit_name VARCHAR(50) NOT NULL,
+    meet_date DATE NOT NULL,
+    activity_title VARCHAR(100),
+    extra_notes VARCHAR(255),
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
 );

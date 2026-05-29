@@ -109,7 +109,7 @@
             <br>
             <fieldset style="margin-bottom: 15px; width: 100%;">
                 <label for="searchInput"><b>Carian Acara:</b></label>
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama acara...">
+                <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 2)" placeholder="Cari nama acara...">
             
                 <table id="table">
                     <caption>Senarai Keseluruhan Acara & Pertandingan</caption>
