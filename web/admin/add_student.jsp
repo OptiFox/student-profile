@@ -15,6 +15,54 @@
         response.sendRedirect("../login.jsp");
         return;
     }
+    
+    String alertMessage = ""; 
+    
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        String studentName = request.getParameter("studentName");
+        String mykid = request.getParameter("mykid");
+        String gender = request.getParameter("gender");
+        String race = request.getParameter("race");
+        int gradeYear = Integer.parseInt(request.getParameter("year"));
+        String className = request.getParameter("class");
+        String uniform = request.getParameter("uniform");
+        String club = request.getParameter("kelab");
+        String sport = request.getParameter("sukan");
+        
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
+            
+            String query = "INSERT INTO Students (student_name, mykid, gender, race, grade_year, class_name, uniform_unit, club, sport) "
+                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, studentName);
+            stmt.setString(2, mykid);
+            stmt.setString(3, gender);
+            stmt.setString(4, race);
+            stmt.setInt(5, gradeYear);
+            stmt.setString(6, className);
+            stmt.setString(7, uniform);
+            stmt.setString(8, club);
+            stmt.setString(9, sport);
+            
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                alertMessage = "<p class='success-text'>Rekod pelajar berjaya disimpan!</p>";
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            alertMessage = "<p class='error-text'>Ralat: MyKid ini telah didaftarkan dalam sistem.</p>";
+        } catch (Exception e) {
+            alertMessage = "<p class='error-text'>Ralat: " + e.getMessage() + "</p>";
+        } finally {
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        }
+    }
 %>
 
 <!DOCTYPE html>
@@ -119,54 +167,7 @@
               <button type="submit" class="btn-primary">Simpan Rekod Pelajar</button>
             </form>
             
-            <%
-                if ("POST".equalsIgnoreCase(request.getMethod())) {
-                    String studentName = request.getParameter("studentName");
-                    String mykid = request.getParameter("mykid");
-                    String gender = request.getParameter("gender");
-                    String race = request.getParameter("race");
-                    int gradeYear = Integer.parseInt(request.getParameter("year"));
-                    String className = request.getParameter("class");
-                    String uniform = request.getParameter("uniform");
-                    String club = request.getParameter("kelab");
-                    String sport = request.getParameter("sukan");
-                    
-                    Connection conn = null;
-                    PreparedStatement stmt = null;
-                    
-                    try {
-                        Class.forName("org.apache.derby.jdbc.ClientDriver");
-                        conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                        
-                        String query = "INSERT INTO Students (student_name, mykid, gender, race, grade_year, class_name, uniform_unit, club, sport)"
-                                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                        
-                        stmt = conn.prepareStatement(query);
-                        
-                        stmt.setString(1, studentName);
-                        stmt.setString(2, mykid);
-                        stmt.setString(3, gender);
-                        stmt.setString(4, race);
-                        stmt.setInt(5, gradeYear);
-                        stmt.setString(6, className);
-                        stmt.setString(7, uniform);
-                        stmt.setString(8, club);
-                        stmt.setString(9, sport);
-                        
-                        int rowsAffected = stmt.executeUpdate();
-                        if (rowsAffected > 0) {
-                            out.println("<p class='success-text'>Rekod pelajar berjaya disimpan!</p>");
-                        }
-                    } catch (SQLIntegrityConstraintViolationException e) {
-                        out.println("<p class='error-text'>Ralat: MyKid ini telah didaftarkan dalam sistem.</p>");
-                    } catch (Exception e) {
-                        out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
-                    } finally {
-                        if (stmt != null) stmt.close();
-                        if (conn != null) conn.close();
-                    }
-                }
-            %>
+            <%= alertMessage %>
         </main>
     </body>
 </html>
