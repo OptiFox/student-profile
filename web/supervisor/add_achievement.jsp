@@ -55,7 +55,7 @@
                                     Class.forName("org.apache.derby.jdbc.ClientDriver");
                                     conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
                                     
-                                    String query = "SELECT student_id, student_name, class_name FROM Students "
+                                    String query = "SELECT student_id, student_name, class_name, grade_year FROM Students "
                                             + "WHERE uniform_unit = ? OR club = ? OR sport = ? ORDER BY student_name ASC";
                                     
                                     stmt = conn.prepareStatement(query);
@@ -68,7 +68,7 @@
                                     while (rs.next()) {
                             %>
                                         <option value="<%= rs.getInt("student_id") %>">
-                                            <%= rs.getString("student_name") %> (<%= rs.getString("class_name") %>)
+                                            <%= rs.getString("student_name") %> (<%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %>)
                                         </option>
                             <%
                                     }

@@ -49,6 +49,11 @@
                             <button class="btn-primary" style="width: 250px;">Log Pencapaian</button>
                         </a>
                     </li>
+                    <li>
+                        <a href="supervisor/update_role.jsp">
+                            <button class="btn-primary" style="width: 250px;">Kemaskini Jawatan Pelajar</button>
+                        </a>
+                    </li>
                 </ul>
             </fieldset>
         </main>

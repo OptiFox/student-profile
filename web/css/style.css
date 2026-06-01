@@ -111,3 +111,7 @@ label {
     display: flex;
     align-items: center;
 }
+
+select {
+    width: 100%;
+}
