@@ -74,7 +74,7 @@
                     <tr>
                         <th>Bil.</th>
                         <th>Nama Penuh</th>
-                        <th>MyKid</th>
+                        <th>No. MyKid</th>
                         <th>Tahun</th>
                         <th>Kelas</th>
                         <th>Status Kehadiran</th>

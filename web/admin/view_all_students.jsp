@@ -35,28 +35,29 @@
         </header>
         
         <main>
-            <fieldset style="margin-bottom: 15px; width: 100%;">
+            <fieldset style="margin-bottom: 20px; width: 100%;">
+                <legend>Carian & Tapisan Pantas</legend>
                 <label for="searchInput"><b>Carian Pelajar:</b></label>
                 <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 2)" placeholder="Cari Nama atau MyKid...">
+            </fieldset>
 
+            <fieldset style="width: 100%;">
                 <table id="table">
                     <caption>Pangkalan Data Pelajar Keseluruhan</caption>
                     <tr>
-                        <th>ID</th>
+                        <th>Bil.</th>
                         <th>Nama Penuh</th>
-                        <th>MyKid</th>
-                        <th>Jantina</th>
-                        <th>Kaum</th>
+                        <th>No. MyKid</th>
                         <th>Tahun</th>
                         <th>Kelas</th>
-                        <th>Unit Beruniform</th>
-                        <th>Kelab & Persatuan</th>
-                        <th>Sukan & Permainan</th>
+                        <th>Tindakan</th>
                     </tr>
                     <%
                         Connection conn = null;
                         PreparedStatement stmt = null;
                         ResultSet rs = null;
+                        int counter = 1; // for bil. row numbers
+                        
                         try {
                             Class.forName("org.apache.derby.jdbc.ClientDriver");
                             conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
@@ -68,20 +69,22 @@
                             while (rs.next()) {
                     %>
                                 <tr>
-                                    <td><%= rs.getInt("student_id") %></td>
+                                    <td><%= counter++ %></td>
                                     <td><%= rs.getString("student_name") %></td>
                                     <td><%= rs.getString("mykid") %></td>
-                                    <td><%= rs.getString("gender") %></td>
-                                    <td><%= rs.getString("race") %></td>
-                                    <td>Tahun <%= rs.getInt("grade_year") %></td> <td><%= rs.getString("class_name") %></td>
-                                    <td><%= rs.getString("uniform_unit") %></td>
-                                    <td><%= rs.getString("club") %></td>
-                                    <td><%= rs.getString("sport") %></td>
+                                    <td>Tahun <%= rs.getInt("grade_year") %></td> 
+                                    <td><%= rs.getString("class_name") %></td>
+                                    <td>
+                                        <a href="view_profile.jsp?id=<%= rs.getInt("student_id") %>" class="btn-primary">Lihat Profil</a>
+                                        <a href="../DeleteStudentServlet?id=<%= rs.getInt("student_id") %>"
+                                           onclick="return confirm('Amaran: Adakah anda pasti mahu memadam rekod pelajar ini secara kekal? Tindakan ini tidak boleh diundur.');"
+                                           class="btn-danger">Padam</a>
+                                    </td>
                                 </tr>
                     <%
                             }
                         } catch (Exception e) {
-                            out.println("<tr><td colspan='10' class='error-text'>Error: " + e.getMessage() + "</td></tr>");
+                            out.println("<tr><td colspan='6' class='error-text'>Error: " + e.getMessage() + "</td></tr>");
                         } finally {
                             if (rs != null) rs.close();
                             if (stmt != null) stmt.close();

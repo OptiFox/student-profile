@@ -87,7 +87,11 @@ th, td {
     border: 1px solid black;
     height: fit-content;
     width: fit-content;
-    padding: 8px;
+    padding: 10px;
+}
+
+th {
+    background-color: #f2f2f2;
 }
 
 #searchInput {
@@ -114,4 +118,8 @@ label {
 
 select {
     width: 100%;
+}
+
+.profile-section { 
+    margin-bottom: 30px; 
 }
