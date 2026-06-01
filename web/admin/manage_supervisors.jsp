@@ -108,7 +108,9 @@
             <fieldset style="margin-bottom: 15px; width: 100%;">
                 <label for="searchInput"><b>Carian Guru:</b></label>
                 <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 3)" placeholder="Cari username...">
-            
+            </fieldset>
+                
+            <fieldset style="width: 100%;">
                 <table id="table">
                     <caption>Direktori Pengguna Sistem</caption>
                     <tr>

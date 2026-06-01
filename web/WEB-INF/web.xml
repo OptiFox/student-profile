@@ -8,6 +8,10 @@
         <servlet-name>DeleteEventServlet</servlet-name>
         <servlet-class>DeleteEventServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeleteStudentServlet</servlet-name>
+        <servlet-class>DeleteStudentServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>DeleteSupervisorServlet</servlet-name>
         <url-pattern>/DeleteSupervisorServlet</url-pattern>
@@ -15,5 +19,9 @@
     <servlet-mapping>
         <servlet-name>DeleteEventServlet</servlet-name>
         <url-pattern>/DeleteEventServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteStudentServlet</servlet-name>
+        <url-pattern>/DeleteStudentServlet</url-pattern>
     </servlet-mapping>
 </web-app>
