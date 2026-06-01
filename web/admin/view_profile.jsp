@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="java.sql.*, com.spis.utils.PAJSKEngine, com.spis.utils.AttendanceCalculator" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -155,15 +155,6 @@
                                         if (attStmt != null) attStmt.close();
                                     }
                                     
-                                    class AttendanceCalculator {
-                                        public String getPercentage(int total, int hadir) {
-                                            if (total == 0) return "0";
-                                            double percentage = ((double) hadir / total) * 100;
-                                            
-                                            return String.format("%.0f", percentage);
-                                        }
-                                    }
-                                    
                                     AttendanceCalculator calc = new AttendanceCalculator();
                                 %>
                                 
@@ -246,7 +237,53 @@
                             
                         <div class="profile-section">
                             <h3>5. Ringkasan Markah PAJSK</h3>
-                            <p><i>(Enjin pengiraan markah PAJSK akan diletakkan di sini)</i></p>
+                            
+                            <%
+                                PAJSKEngine pajsk = new PAJSKEngine();
+                                
+                                int totalAllMeetings = uniTot + clubTot + sportTot;
+                                int totalAllAttended = uniHad + clubHad + sportHad;
+                                
+                                int scoreAttendance = pajsk.getAttendanceScore(totalAllMeetings, totalAllAttended);
+                                int scoreRole = pajsk.getRoleScore(profileRs.getString("uniform_role"), profileRs.getString("club_role"), profileRs.getString("sport_role"));
+                                int scoreInvolvement = pajsk.getInvolvementScore(totalAllAttended);
+                                int scoreAchievement = pajsk.getAchievementScore(conn, studentId);
+                                
+                                int totalScore = scoreAttendance + scoreRole + scoreInvolvement + scoreAchievement;
+                                
+                                String grade = "E";
+                                if (totalScore >= 80) grade = "A";
+                                else if (totalScore >= 60) grade = "B";
+                                else if (totalScore >= 40) grade = "C";
+                                else if (totalScore >= 20) grade = "D";
+                            %>
+                            
+                            <table>
+                                <tr>
+                                    <th>Elemen Penilaian</th>
+                                    <th>Markah Terkumpul</th>
+                                </tr>
+                                <tr>
+                                    <td>Kehadiran (Max 50)</td>
+                                    <td><%= scoreAttendance %></td>
+                                </tr>
+                                <tr>
+                                    <td>Jawatan (Max 10)</td>
+                                    <td><%= scoreRole %></td>
+                                </tr>
+                                <tr>
+                                    <td>Penglibatan (Max 20)</td>
+                                    <td><%= scoreInvolvement %></td>
+                                </tr>
+                                <tr>
+                                    <td>Pencapaian (Max 20)</td>
+                                    <td><%= scoreAchievement %></td>
+                                </tr>
+                                <tr>
+                                    <th>Jumlah Keseluruhan</th>
+                                    <th><%= totalScore %> / 100 (Gred <%= grade %>)</th>
+                                </tr>
+                            </table>
                         </div>
             <%
                     } else {
