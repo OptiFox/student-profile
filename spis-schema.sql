@@ -34,7 +34,10 @@ CREATE TABLE Students (
     class_name VARCHAR(50),
     uniform_unit VARCHAR(50),
     club VARCHAR(50),
-    sport VARCHAR(50)
+    sport VARCHAR(50),
+    uniform_role VARCHAR(50) DEFAULT 'Ahli Biasa',
+    club_role VARCHAR(50) DEFAULT 'Ahli Biasa',
+    sport_role VARCHAR(50) DEFAULT 'Ahli Biasa'
 );
 
 DROP TABLE Attendance;
@@ -48,4 +51,17 @@ CREATE TABLE Attendance (
     extra_notes VARCHAR(255),
     status VARCHAR(20) NOT NULL,
     FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
+);
+
+DROP TABLE Achievements;
+
+CREATE TABLE Achievements (
+    achievement_id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) PRIMARY KEY,
+    student_id INT NOT NULL,
+    event_id INT NOT NULL,
+    comp_level VARCHAR(50) NOT NULL, 
+    result VARCHAR(50) NOT NULL,     
+    recorded_by VARCHAR(50),         
+    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES Events(event_id) ON DELETE CASCADE
 );

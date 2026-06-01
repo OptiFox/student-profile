@@ -44,6 +44,11 @@
                             <button class="btn-primary" style="width: 250px;">Kemaskini Kehadiran</button>
                         </a>
                     </li>
+                    <li>
+                        <a href="supervisor/add_achievement.jsp">
+                            <button class="btn-primary" style="width: 250px;">Log Pencapaian</button>
+                        </a>
+                    </li>
                 </ul>
             </fieldset>
         </main>

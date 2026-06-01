@@ -45,6 +45,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     padding: 8px;
 }
 
+form > .btn-primary {
+    margin: 12px 0 0;
+}
+
 header.flex {
     display: flex;
     justify-content: space-between;
