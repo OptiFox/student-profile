@@ -96,7 +96,102 @@
                                 
                         <div class="profile-section">
                             <h3>3. Jadual Rekod Kehadiran</h3>
-                            <p><i>(Sistem pengiraan kehadiran akan diletakkan di sini)</i></p>
+                            
+                            <table>
+                                <tr>
+                                    <th>Kategori</th>
+                                    <th>Aktiviti</th>
+                                    <th>Jumlah Perjumpaan</th>
+                                    <th>Hadir</th>
+                                    <th>Tidak Hadir</th>
+                                    <th>Peratus Kehadiran (%)</th>
+                                </tr>
+                                
+                                <%
+                                    String unitBeruniform = profileRs.getString("uniform_unit") != null ? profileRs.getString("uniform_unit") : "Tiada";
+                                    String kelabPersatuan = profileRs.getString("club") != null ? profileRs.getString("club") : "Tiada";
+                                    String sukanPermainan = profileRs.getString("sport") != null ? profileRs.getString("sport") : "Tiada";
+                                    
+                                    int uniTot = 0, uniHad = 0, uniTid = 0;
+                                    int clubTot = 0, clubHad = 0, clubTid = 0;
+                                    int sportTot = 0, sportHad = 0, sportTid = 0;
+                                    
+                                    // fetch attendance
+                                    PreparedStatement attStmt = null;
+                                    ResultSet attRs = null;
+                                    
+                                    try {
+                                        String attQuery = "SELECT unit_name, "
+                                                + "COUNT(attendance_id) AS total_perjumpaan, "
+                                                + "COUNT(CASE WHEN status = 'Hadir' THEN 1 ELSE NULL END) AS total_hadir, "
+                                                + "COUNT(CASE WHEN status = 'Tidak Hadir' THEN 1 ELSE NULL END) AS total_tidak_hadir "
+                                                + "FROM Attendance "
+                                                + "WHERE student_id = ? "
+                                                + "GROUP BY unit_name";
+                                        
+                                        attStmt = conn.prepareStatement(attQuery);
+                                        attStmt.setInt(1, studentId);
+                                        attRs = attStmt.executeQuery();
+                                        
+                                        while (attRs.next()) {
+                                            String fetchedUnit = attRs.getString("unit_name");
+                                            
+                                            if (unitBeruniform.equals(fetchedUnit)) {
+                                                uniTot = attRs.getInt("total_perjumpaan");
+                                                uniHad = attRs.getInt("total_hadir");
+                                                uniTid = attRs.getInt("total_tidak_hadir");
+                                            } else if (kelabPersatuan.equals(fetchedUnit)) {
+                                                clubTot = attRs.getInt("total_perjumpaan");
+                                                clubHad = attRs.getInt("total_hadir");
+                                                clubTid = attRs.getInt("total_tidak_hadir");
+                                            } else if (sukanPermainan.equals(fetchedUnit)) {
+                                                sportTot = attRs.getInt("total_perjumpaan");
+                                                sportHad = attRs.getInt("total_hadir");
+                                                sportTid = attRs.getInt("total_tidak_hadir");
+                                            }
+                                        }
+                                    } finally {
+                                        if (attRs != null) attRs.close();
+                                        if (attStmt != null) attStmt.close();
+                                    }
+                                    
+                                    class AttendanceCalculator {
+                                        public String getPercentage(int total, int hadir) {
+                                            if (total == 0) return "0";
+                                            double percentage = ((double) hadir / total) * 100;
+                                            
+                                            return String.format("%.0f", percentage);
+                                        }
+                                    }
+                                    
+                                    AttendanceCalculator calc = new AttendanceCalculator();
+                                %>
+                                
+                                <tr>
+                                    <td><b>Unit Beruniform</b></td>
+                                    <td><%= unitBeruniform %></td>
+                                    <td><%= uniTot %></td>
+                                    <td><%= uniHad %></td>
+                                    <td><%= uniTid %></td>
+                                    <td><%= calc.getPercentage(uniTot, uniHad) %></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Kelab & Persatuan</b></td>
+                                    <td><%= kelabPersatuan %></td>
+                                    <td><%= clubTot %></td>
+                                    <td><%= clubHad %></td>
+                                    <td><%= clubTid %></td>
+                                    <td><%= calc.getPercentage(clubTot, clubHad) %></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Sukan & Permainan</b></td>
+                                    <td><%= sukanPermainan %></td>
+                                    <td><%= sportTot %></td>
+                                    <td><%= sportHad %></td>
+                                    <td><%= sportTid %></td>
+                                    <td><%= calc.getPercentage(sportTot, sportHad) %></td>
+                                </tr>
+                            </table>
                         </div>
                                 
                         <div class="profile-section">
