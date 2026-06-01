@@ -60,6 +60,11 @@
                             <button class="btn-secondary" style="width: 250px;">Papar Keseluruhan Pelajar</button>
                         </a>
                     </li>
+                    <li>
+                        <a href="admin/generate_report.jsp">
+                            <button class="btn-secondary" style="width: 250px; background-color: #28a745;">Penjanaan Laporan</button>
+                        </a>
+                    </li>
                 </ul>
             </fieldset>
         </main>

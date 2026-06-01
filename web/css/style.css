@@ -49,6 +49,10 @@ form > .btn-primary {
     margin: 12px 0 0;
 }
 
+fieldset > .btn-primary {
+    margin: 12px 0 0;
+}
+
 header.flex {
     display: flex;
     justify-content: space-between;
@@ -58,6 +62,13 @@ header.flex {
     margin: 0 0 8px;
     
     color: white;
+}
+
+div.flex {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 15px;
 }
 
 main {
@@ -122,4 +133,26 @@ select {
 
 .profile-section { 
     margin-bottom: 30px; 
+}
+
+@media print {
+    body { 
+        background-color: white; 
+        color: black; 
+    }
+    
+    .no-print { 
+        display: none !important; 
+    }
+    
+    main { 
+        box-shadow: none !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+    }
+    
+    @page { 
+        margin: 1cm; 
+        size: landscape; 
+    }
 }

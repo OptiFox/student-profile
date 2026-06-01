@@ -10,6 +10,7 @@
 <%
     String currentUser = (String) session.getAttribute("username");
     String currentRole = (String) session.getAttribute("userRole");
+    
     if (currentUser == null || !"ADMIN".equals(currentRole)) {
         response.sendRedirect("../login.jsp");
         return; 
