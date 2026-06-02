@@ -118,7 +118,7 @@
                                 <tr>
                                     <td><%= counter++ %></td>
                                     <td><%= rs.getString("student_name") %></td>
-                                    <td>Tahun <%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %></td>
+                                    <td><%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %></td>
                                     <td><b><%= roleInThisUnit != null ? roleInThisUnit : "Ahli Biasa" %></b></td>
                                     <td style="text-align: center;"><%= totalScore %> / 100</td>
                                     <td style="text-align: center; font-weight: bold; color: <%= grade.equals("A") ? "green" : (grade.equals("E") ? "red" : "black") %>;"><%= grade %></td>

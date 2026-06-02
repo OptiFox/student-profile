@@ -59,6 +59,11 @@
                             <button class="btn-primary" style="width: 250px;">Kemaskini Jawatan Pelajar</button>
                         </a>
                     </li>
+                    <li>
+                        <a href="supervisor/manage_records.jsp">
+                            <button class="btn-secondary" style="width: 250px;">Urus & Padam Rekod</button>
+                        </a>
+                    </li>
                 </ul>
             </fieldset>
         </main>
