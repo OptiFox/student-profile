@@ -21,6 +21,22 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     margin: 10px 0 0 0;
 }
 
+.btn-success {
+    text-decoration: none;
+    background: #28a745;
+    color: white;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.btn-warning {
+    text-decoration: none;
+    background: #ffff00;
+    color: black;
+    border-radius: 8px;
+    padding: 8px;
+}
+
 .btn-danger {
     text-decoration: none;
     background: red;
@@ -45,11 +61,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     padding: 8px;
 }
 
-form > .btn-primary {
-    margin: 12px 0 0;
-}
-
-fieldset > .btn-primary {
+form > .btn-primary,
+fieldset > .btn-primary,
+form > .btn-success,
+fieldset > .btn-success {
     margin: 12px 0 0;
 }
 

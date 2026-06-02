@@ -62,7 +62,7 @@
                     </li>
                     <li>
                         <a href="admin/generate_report.jsp">
-                            <button class="btn-secondary" style="width: 250px; background-color: #28a745;">Penjanaan Laporan</button>
+                            <button class="btn-success" style="width: 250px;">Penjanaan Laporan</button>
                         </a>
                     </li>
                 </ul>

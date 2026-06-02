@@ -61,7 +61,7 @@
                             </select>
                         </p>
                         
-                        <button type="submit" class="btn-primary" style="background-color: #28a745;">Jana Laporan</button>
+                        <button type="submit" class="btn-success">Jana Laporan</button>
                     </fieldset>
                 </form>
             </div>

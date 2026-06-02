@@ -76,6 +76,7 @@
                                     <td><%= rs.getString("class_name") %></td>
                                     <td>
                                         <a href="view_profile.jsp?id=<%= rs.getInt("student_id") %>" class="btn-primary">Lihat Profil</a>
+                                        <a href="edit_student.jsp?id=<%= rs.getInt("student_id") %>" class="btn-warning">Kemaskini</a>
                                         <a href="../DeleteStudentServlet?id=<%= rs.getInt("student_id") %>"
                                            onclick="return confirm('Amaran: Adakah anda pasti mahu memadam rekod pelajar ini secara kekal? Tindakan ini tidak boleh diundur.');"
                                            class="btn-danger">Padam</a>
