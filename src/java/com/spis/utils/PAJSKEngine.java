@@ -82,4 +82,12 @@ public class PAJSKEngine {
         
         return maxScore;
     }
+    
+    public String getGrade(int totalScore) {
+        if (totalScore >= 80) return "A";
+        if (totalScore >= 60) return "B";
+        if (totalScore >= 40) return "C";
+        if (totalScore >= 20) return "D";
+        return "E";
+    }
 }

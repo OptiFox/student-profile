@@ -252,11 +252,7 @@
                                 
                                 int totalScore = scoreAttendance + scoreRole + scoreInvolvement + scoreAchievement;
                                 
-                                String grade = "E";
-                                if (totalScore >= 80) grade = "A";
-                                else if (totalScore >= 60) grade = "B";
-                                else if (totalScore >= 40) grade = "C";
-                                else if (totalScore >= 20) grade = "D";
+                                String grade = pajsk.getGrade(totalScore);
                             %>
                             
                             <table>

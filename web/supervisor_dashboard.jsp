@@ -40,6 +40,11 @@
                 <legend><b>Menu Utama</b></legend>
                 <ul class="btn">
                     <li>
+                        <a href="supervisor/view_unit_students.jsp">
+                            <button class="btn-primary" style="width: 250px; background-color: #17a2b8;">Senarai Pelajar Unit</button>
+                        </a>
+                    </li>
+                    <li>
                         <a href="supervisor/take_attendance.jsp">
                             <button class="btn-primary" style="width: 250px;">Kemaskini Kehadiran</button>
                         </a>
