@@ -19,15 +19,20 @@
             <h1>Sistem Profil Pelajar (SPIS) - Log Masuk Pengguna</h1>
         </header>
         
-        <form action="login.jsp" method="post">
-            <label for="username">Nama Pengguna:</label>
-            <input type="text" id="username" name="username" required>
-            
-            <label for="password">Kata Laluan:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <button type="submit">Log Masuk</button>
-        </form>
+        <div class="flex-center">
+            <h2>Log Masuk</h2>
+            <fieldset>
+                <form action="login.jsp" method="post">
+                    <label for="username">Nama Pengguna:</label>
+                    <input type="text" id="username" name="username" required>
+
+                    <label for="password">Kata Laluan:</label>
+                    <input type="password" id="password" name="password" required>
+
+                    <button type="submit" class="btn-success">Log Masuk</button>
+                </form>
+            </fieldset>
+        </div>
         
         <%
             if ("POST".equalsIgnoreCase(request.getMethod())) {

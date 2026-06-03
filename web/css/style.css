@@ -86,6 +86,14 @@ div.flex {
     margin-bottom: 15px;
 }
 
+div.flex-center {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    margin-bottom: 15px;
+}
+
 main {
     margin: 8px;
 }
