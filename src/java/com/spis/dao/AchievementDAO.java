@@ -25,14 +25,14 @@ public class AchievementDAO {
                 + "ORDER BY e.event_date DESC";
         
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     AchievementLogDTO dto = new AchievementLogDTO();
                     
-                    dto.setAchievementId(rs.getInt("attendance_id"));
+                    dto.setAchievementId(rs.getInt("achievement_id"));
                     dto.setEventName(rs.getString("event_name"));
                     dto.setEventDate(rs.getDate("event_date"));
                     dto.setStudentName(rs.getString("student_name"));

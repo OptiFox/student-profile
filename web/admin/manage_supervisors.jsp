@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="com.spis.models.User, com.spis.dao.UserDAO, com.spis.utils.SecurityUtils, java.util.ArrayList" %>
 
 <%
     // Checks if the user is admin or not (security)
@@ -42,10 +42,10 @@
                 <legend>Daftar Guru Baharu</legend>
                 
                 <form action="manage_supervisors.jsp" method="post">
-                    <label for="newUsername">Username:</label>
+                    <label for="newUsername">Nama Pengguna:</label>
                     <input type="text" id="newUsername" name="newUsername" required>
             
-                    <label for="password">Password:</label>
+                    <label for="password">Kata Laluan:</label>
                     <input type="password" id="newPassword" name="newPassword" required>
                     
                     <p>
@@ -71,36 +71,21 @@
                 String passwordInput = request.getParameter("newPassword");
                 String categoryInput = request.getParameter("category");
                 String unitInput = request.getParameter("unit");
-                
-                Connection conn = null;
-                PreparedStatement stmt = null;
             
                 try {
-                    Class.forName("org.apache.derby.jdbc.ClientDriver");
-                    conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
+                    String hashedPassword = SecurityUtils.hashPassword(passwordInput);
                     
-                    // SUPERVISOR role is hardcoded so that admin doesn't have to type
-                    String query = "INSERT INTO Users (username, password, role, assigned_category, assigned_unit) VALUES (?, ?, 'SUPERVISOR', ?, ?)";
-                
-                    stmt = conn.prepareStatement(query);
-                    stmt.setString(1, usernameInput);
-                    stmt.setString(2, passwordInput);
-                    stmt.setString(3, categoryInput);
-                    stmt.setString(4, unitInput);
-                
-                    int rowsAffected = stmt.executeUpdate();
+                    // SUPERVISOR role in hardcoded
+                    User newUser = new User(0, usernameInput, hashedPassword, "SUPERVISOR", categoryInput, unitInput);
                     
-                    if (rowsAffected > 0) {
+                    if (UserDAO.addUser(newUser)) {
                         out.println("<p class='success-text'>Pendaftaran berjaya! Akaun guru sedia untuk digunakan.</p>");
-                    }
-                } catch (SQLIntegrityConstraintViolationException e) {
-                    out.println("<p class='error-text'>Ralat: Username ini telah wujud.</p>");
+                    } else {
+                        out.println("<p class='error-text'>Ralat: Nama pengguna ini mungkin telah wujud.</p>");
+                    } 
                 } catch (Exception e) {
                     out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
-                } finally {
-                    if (stmt != null) stmt.close();
-                    if (conn != null) conn.close();
-                }   
+                } 
             }
             %>
             </fieldset>
@@ -121,26 +106,17 @@
                         <th>Tindakan</th>
                     </tr>
                 <%
-                    Connection conn = null;
-                    PreparedStatement stmt = null;
-                    ResultSet rs = null;
-                    try {
-                        Class.forName("org.apache.derby.jdbc.ClientDriver"); // fix retrieve db failed
-                        conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                        String query = "SELECT * FROM Users WHERE role = 'SUPERVISOR' ORDER BY assigned_category, assigned_unit";
-                        stmt = conn.prepareStatement(query);
-                        rs = stmt.executeQuery();
-                        
-                        // Iterate over the result set and display each record
-                        while (rs.next()) {
+                    ArrayList<User> supervisorList = UserDAO.getAllSupervisors();
+                    
+                    for (User spv : supervisorList) {
                 %>
                         <tr>
-                            <td><%= rs.getInt("user_id") %></td>
-                            <td><%= rs.getString("username") %></td>
-                            <td><%= rs.getString("assigned_category") %></td>
-                            <td><%= rs.getString("assigned_unit") %></td>
+                            <td><%= spv.getUserId() %></td>
+                            <td><%= spv.getUsername() %></td>
+                            <td><%= spv.getAssignedCategory() %></td>
+                            <td><%= spv.getAssignedUnit() %></td>
                             <td>
-                                <a href="../DeleteSupervisorServlet?id=<%= rs.getInt("user_id") %>"
+                                <a href="../DeleteSupervisorServlet?id=<%= spv.getUserId() %>"
                                    onclick="return confirm('Padam pengguna ini?');"
                                    class="btn-danger">
                                    Padam
@@ -148,13 +124,6 @@
                             </td>
                         </tr>
                 <%
-                        }
-                    } catch (SQLException e) {
-                        out.println("Error retrieving users: " + e.getMessage());
-                    } finally {
-                        if (rs != null) rs.close();
-                        if (stmt != null) stmt.close();
-                        if (conn != null) conn.close();
                     }
                 %>
                 </table>

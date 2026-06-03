@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="com.spis.models.User, com.spis.dao.UserDAO" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -20,10 +20,10 @@
         </header>
         
         <form action="login.jsp" method="post">
-            <label for="username">Username:</label>
+            <label for="username">Nama Pengguna:</label>
             <input type="text" id="username" name="username" required>
             
-            <label for="password">Password:</label>
+            <label for="password">Kata Laluan:</label>
             <input type="password" id="password" name="password" required>
             
             <button type="submit">Log Masuk</button>
@@ -33,47 +33,28 @@
             if ("POST".equalsIgnoreCase(request.getMethod())) {
                 String usernameInput = request.getParameter("username");
                 String passwordInput = request.getParameter("password");
-                
-                Connection conn = null;
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
             
                 try {
-                    Class.forName("org.apache.derby.jdbc.ClientDriver");
-                    conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                    
-                    String query = "SELECT role, assigned_unit, assigned_category FROM Users WHERE username = ? AND password = ?";
+                    User loggedInUser = UserDAO.authenticateUser(usernameInput, passwordInput);
                 
-                    stmt = conn.prepareStatement(query);
-                    stmt.setString(1, usernameInput);
-                    stmt.setString(2, passwordInput);
-                
-                    rs = stmt.executeQuery();
-                
-                    if (rs.next()) {
-                        String userRole = rs.getString("role");
-                        String userUnit = rs.getString("assigned_unit");
-                        
-                        session.setAttribute("username", usernameInput);
-                        session.setAttribute("userRole", userRole);
-                        session.setAttribute("assignedUnit", userUnit);
-                        session.setAttribute("assignedCategory", rs.getString("assigned_category"));
+                    if (loggedInUser != null) {
+                        session.setAttribute("currentUser", loggedInUser);
+                        session.setAttribute("username", loggedInUser.getUsername());
+                        session.setAttribute("userRole", loggedInUser.getRole());
+                        session.setAttribute("assignedUnit", loggedInUser.getAssignedUnit());
+                        session.setAttribute("assignedCategory", loggedInUser.getAssignedCategory());
                     
                         // Only admin can access admin dashboard
-                        if ("ADMIN".equals(userRole)) {
+                        if ("ADMIN".equals(loggedInUser.getRole())) {
                             response.sendRedirect("admin_dashboard.jsp");
                         } else {
                             response.sendRedirect("supervisor_dashboard.jsp");
                         }
                     } else {
-                        out.println("<p class='error-text'>Ralat: Username atau password tidak sah.</p>");
+                        out.println("<p class='error-text'>Log masuk gagal. Nama pengguna atau kata laluan tidak sah.</p>");
                     }
                 } catch (Exception e) {
-                    out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
-                } finally {
-                    if (rs != null) rs.close();
-                    if (stmt != null) stmt.close();
-                    if (conn != null) conn.close();
+                    out.println("<p class='error-text'>Ralat sistem: " + e.getMessage() + "</p>");
                 }   
             }
         %>
