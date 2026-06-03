@@ -3,7 +3,7 @@ DROP TABLE Users;
 CREATE TABLE Users (
     user_id INT NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL,
     assigned_category VARCHAR(50),
     assigned_unit VARCHAR(50)
