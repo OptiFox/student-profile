@@ -92,6 +92,11 @@ div.flex-center {
     justify-content: center; 
     align-items: center; 
     margin-bottom: 15px;
+    width: 100vw;
+}
+
+div.flex-center fieldset {
+    width: 100%;
 }
 
 main {

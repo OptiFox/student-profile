@@ -81,7 +81,7 @@
                     if (UserDAO.addUser(newUser)) {
                         out.println("<p class='success-text'>Pendaftaran berjaya! Akaun guru sedia untuk digunakan.</p>");
                     } else {
-                        out.println("<p class='error-text'>Ralat: Nama pengguna ini mungkin telah wujud.</p>");
+                        out.println("<p class='error-text'>Ralat: Nama pengguna ini telah wujud.</p>");
                     } 
                 } catch (Exception e) {
                     out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
