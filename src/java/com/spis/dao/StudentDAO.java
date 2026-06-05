@@ -7,6 +7,7 @@ package com.spis.dao;
 import com.spis.models.Student;
 import com.spis.utils.DBConnection;
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -35,5 +36,37 @@ public class StudentDAO {
             System.out.println("Error adding student: " + e.getMessage());
             return false;
         }
+    }
+    
+    public static ArrayList<Student> getAllStudents() {
+        ArrayList<Student> list = new ArrayList<>();
+        String query = "SELECT * FROM Students ORDER BY grade_year ASC, class_name ASC, student_name ASC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                list.add(new Student(
+                    rs.getInt("student_id"),
+                    rs.getString("student_name"),
+                    rs.getString("mykid"),
+                    rs.getString("gender"),
+                    rs.getString("race"),
+                    rs.getInt("grade_year"),
+                    rs.getString("class_name"),
+                    rs.getString("uniform_unit"),
+                    rs.getString("club"),
+                    rs.getString("sport"),
+                    rs.getString("uniform_role"),
+                    rs.getString("club_role"),
+                    rs.getString("sport_role")
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching students: " + e.getMessage());
+        }
+        
+        return list;
     }
 }

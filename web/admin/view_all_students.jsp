@@ -5,7 +5,8 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="java.util.ArrayList" %>
+<%@page import="com.spis.models.Student, com.spis.dao.StudentDAO" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -15,6 +16,8 @@
         response.sendRedirect("../login.jsp");
         return; 
     }
+    
+    ArrayList<Student> list = StudentDAO.getAllStudents();
 %>
 
 <!DOCTYPE html>
@@ -52,44 +55,31 @@
                         <th>Kelas</th>
                         <th>Tindakan</th>
                     </tr>
-                    <%
-                        Connection conn = null;
-                        PreparedStatement stmt = null;
-                        ResultSet rs = null;
-                        int counter = 1; // for bil. row numbers
-                        
-                        try {
-                            Class.forName("org.apache.derby.jdbc.ClientDriver");
-                            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                            
-                            String query = "SELECT * FROM Students ORDER BY grade_year ASC, class_name ASC, student_name ASC"; 
-                            stmt = conn.prepareStatement(query);
-                            rs = stmt.executeQuery();
-                            
-                            while (rs.next()) {
+                    <%  if (list.isEmpty()) { %>
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Tiada rekod pelajar ditemui.</td>
+                    </tr>
+                    <%  
+                        } else { 
+                            int counter = 1; // for bil. row numbers
+                            for (Student row : list) {
                     %>
                                 <tr>
                                     <td><%= counter++ %></td>
-                                    <td><%= rs.getString("student_name") %></td>
-                                    <td><%= rs.getString("mykid") %></td>
-                                    <td>Tahun <%= rs.getInt("grade_year") %></td> 
-                                    <td><%= rs.getString("class_name") %></td>
+                                    <td><%= row.getStudentName() %></td>
+                                    <td><%= row.getMykid() %></td>
+                                    <td>Tahun <%= row.getGradeYear() %></td> 
+                                    <td><%= row.getClassName() %></td>
                                     <td>
-                                        <a href="view_profile.jsp?id=<%= rs.getInt("student_id") %>" class="btn-primary">Lihat Profil</a>
-                                        <a href="edit_student.jsp?id=<%= rs.getInt("student_id") %>" class="btn-warning">Kemaskini</a>
-                                        <a href="../DeleteStudentServlet?id=<%= rs.getInt("student_id") %>"
+                                        <a href="view_profile.jsp?id=<%= row.getStudentId() %>" class="btn-primary">Lihat Profil</a>
+                                        <a href="edit_student.jsp?id=<%= row.getStudentId() %>" class="btn-warning">Kemaskini</a>
+                                        <a href="../DeleteStudentServlet?id=<%= row.getStudentId() %>"
                                            onclick="return confirm('Amaran: Adakah anda pasti mahu memadam rekod pelajar ini secara kekal? Tindakan ini tidak boleh diundur.');"
                                            class="btn-danger">Padam</a>
                                     </td>
                                 </tr>
                     <%
                             }
-                        } catch (Exception e) {
-                            out.println("<tr><td colspan='6' class='error-text'>Error: " + e.getMessage() + "</td></tr>");
-                        } finally {
-                            if (rs != null) rs.close();
-                            if (stmt != null) stmt.close();
-                            if (conn != null) conn.close();
                         }
                     %>
                 </table>
