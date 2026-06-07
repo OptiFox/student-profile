@@ -45,8 +45,8 @@
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
             
-            String updateQuery = "UPDATE Students SET student_name=?, mykid=?, gender=?, race=?, grade_year=?, "
-                               + "class_name=?, uniform_unit=?, club=?, sport=? WHERE student_id=?";
+            String updateQuery = "UPDATE Students SET student_name = ?, mykid = ?, gender = ?, race = ?, grade_year = ?, "
+                               + "class_name = ?, uniform_unit = ?, club = ?, sport = ? WHERE student_id = ?";
             
             stmt = conn.prepareStatement(updateQuery);
             stmt.setString(1, studentName);
