@@ -69,4 +69,38 @@ public class StudentDAO {
         
         return list;
     }
+    
+    public static Student getStudentById(int studentId) {
+        String query = "SELECT * FROM Students WHERE student_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            
+            stmt.setInt(1, studentId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Student(
+                        rs.getInt("student_id"),
+                        rs.getString("student_name"),
+                        rs.getString("mykid"),
+                        rs.getString("gender"),
+                        rs.getString("race"),
+                        rs.getInt("grade_year"),
+                        rs.getString("class_name"),
+                        rs.getString("uniform_unit"),
+                        rs.getString("club"),
+                        rs.getString("sport"),
+                        rs.getString("uniform_role"),
+                        rs.getString("club_role"),
+                        rs.getString("sport_role")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching student with that ID: " + e.getMessage());
+        }
+        
+        return null;
+    }
 }

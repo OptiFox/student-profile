@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.sql.*" %>
+<%@page import="com.spis.models.Student, com.spis.dao.StudentDAO" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -80,41 +81,21 @@
     String dbName = "", dbMykid = "", dbGender = "", dbRace = "", dbClass = "", dbUniform = "", dbClub = "", dbSport = "";
     int dbYear = 0;
     
-    Connection fetchConn = null;
-    PreparedStatement fetchStmt = null;
-    ResultSet fetchRs = null;
-    
-    try {
-        Class.forName("org.apache.derby.jdbc.ClientDriver");
-        fetchConn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
+    Student student = StudentDAO.getStudentById(studentId);
         
-        String fetchQuery = "SELECT * FROM Students WHERE student_id = ?";
-        
-        fetchStmt = fetchConn.prepareStatement(fetchQuery);
-        fetchStmt.setInt(1, studentId);
-        
-        fetchRs = fetchStmt.executeQuery();
-        
-        if (fetchRs.next()) {
-            dbName = fetchRs.getString("student_name");
-            dbMykid = fetchRs.getString("mykid");
-            dbGender = fetchRs.getString("gender");
-            dbRace = fetchRs.getString("race");
-            dbYear = fetchRs.getInt("grade_year");
-            dbClass = fetchRs.getString("class_name");
-            dbUniform = fetchRs.getString("uniform_unit");
-            dbClub = fetchRs.getString("club");
-            dbSport = fetchRs.getString("sport");
-        } else {
-            response.sendRedirect("view_all_students.jsp");
-            return;
-        }
-    } catch (Exception e) {
-        alertMessage = "<p class='error-text'>Gagal memuat turun data pelajar.</p>";
-    } finally {
-        if (fetchRs != null) fetchRs.close();
-        if (fetchStmt != null) fetchStmt.close();
-        if (fetchConn != null) fetchConn.close();
+    if (student != null) {
+        dbName = student.getStudentName();
+        dbMykid = student.getMykid();
+        dbGender = student.getGender();
+        dbRace = student.getRace();
+        dbYear = student.getGradeYear();
+        dbClass = student.getClassName();
+        dbUniform = student.getUniformUnit();
+        dbClub = student.getClub();
+        dbSport = student.getSport();
+    } else {
+        response.sendRedirect("view_all_students.jsp");
+        return;
     }
 %>
 
