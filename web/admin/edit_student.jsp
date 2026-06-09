@@ -43,27 +43,10 @@
         PreparedStatement stmt = null;
         
         try {
-            Class.forName("org.apache.derby.jdbc.ClientDriver");
-            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
+            Student student = new Student(studentId, studentName, mykid, gender, race, gradeYear, className, 
+                                          uniform, club, sport, "", "", "");
             
-            String updateQuery = "UPDATE Students SET student_name = ?, mykid = ?, gender = ?, race = ?, grade_year = ?, "
-                               + "class_name = ?, uniform_unit = ?, club = ?, sport = ? WHERE student_id = ?";
-            
-            stmt = conn.prepareStatement(updateQuery);
-            stmt.setString(1, studentName);
-            stmt.setString(2, mykid);
-            stmt.setString(3, gender);
-            stmt.setString(4, race);
-            stmt.setInt(5, gradeYear);
-            stmt.setString(6, className);
-            stmt.setString(7, uniform);
-            stmt.setString(8, club);
-            stmt.setString(9, sport);
-            stmt.setInt(10, studentId);
-            
-            int rowsAffected = stmt.executeUpdate();
-            
-            if (rowsAffected > 0) {
+            if (StudentDAO.updateStudent(student)) {
                 response.sendRedirect("view_profile.jsp?id=" + studentId);
                 return;
             }
@@ -71,9 +54,6 @@
             alertMessage = "<p class='error-text'>Ralat: MyKid ini telah wujud untuk pelajar lain.</p>";
         } catch (Exception e) {
             alertMessage = "<p class='error-text'>Ralat Pangkalan Data: " + e.getMessage() + "</p>";
-        } finally {
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
         }
     }
     
