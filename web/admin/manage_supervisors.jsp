@@ -16,6 +16,30 @@
         response.sendRedirect("../login.jsp");
         return; // stop page from loading
     }
+    
+    String alertMessage = "";
+    
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        String usernameInput = request.getParameter("newUsername");
+        String passwordInput = request.getParameter("newPassword");
+        String categoryInput = request.getParameter("category");
+        String unitInput = request.getParameter("unit");
+    
+        try {
+            String hashedPassword = SecurityUtils.hashPassword(passwordInput);
+            
+            // SUPERVISOR role is hardcoded
+            User newUser = new User(0, usernameInput, hashedPassword, "SUPERVISOR", categoryInput, unitInput);
+            
+            if (UserDAO.addUser(newUser)) {
+                alertMessage = "<p class='success-text' style='margin-bottom: 15px;'>Pendaftaran berjaya! Akaun guru sedia untuk digunakan.</p>";
+            } else {
+                alertMessage = "<p class='error-text' style='margin-bottom: 15px;'>Ralat: Nama pengguna ini telah wujud.</p>";
+            } 
+        } catch (Exception e) {
+            alertMessage = "<p class='error-text' style='margin-bottom: 15px;'>Ralat: " + e.getMessage() + "</p>";
+        } 
+    }
 %>
 
 <!DOCTYPE html>
@@ -24,112 +48,121 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="../css/style.css">
         <script src="../js/unit_data.js"></script>
-        
         <title>SPIS - Urus Guru Penasihat</title>
     </head>
     <body>
-        <header class="flex">
-            <h1>Sistem Profil Pelajar (SPIS) - Pendaftaran Guru Penasihat</h1>
+        <div class="dashboard-layout">
             
-            <div>
-                <a href="../admin_dashboard.jsp" class="btn-secondary">Kembali</a>
-                <a href="../logout.jsp" class="btn-danger">Log Keluar</a>
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>SPIS Admin</h2>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="../admin_dashboard.jsp">Papan Pemuka</a>
+                    
+                    <a href="manage_supervisors.jsp" class="active">Urus Guru Penasihat</a>
+                    <a href="manage_events.jsp">Urus Senarai Acara</a>
+                    <a href="add_student.jsp">Daftar Pelajar Baharu</a>
+                    <a href="view_all_students.jsp">Papar Keseluruhan Pelajar</a>
+                    <a href="generate_report.jsp">Penjanaan Laporan</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <a href="../logout.jsp" class="btn-danger">Log Keluar</a>
+                </div>
+            </aside>
+            
+            <div class="main-content">
+                <header class="top-header">
+                    <div>
+                        <h2 style="margin: 0; color: #2c3e50;">Pendaftaran Guru Penasihat</h2>
+                    </div>
+                    <div>
+                        <a href="../admin_dashboard.jsp" class="btn-secondary">Kembali</a>
+                    </div>
+                </header>
+                
+                <main class="content-body">
+                    <%= alertMessage %>
+                    
+                    <div style="max-width: 800px; background: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 30px;">
+                        <h3 style="margin-top: 0;">Daftar Guru Baharu</h3>
+                        
+                        <form action="manage_supervisors.jsp" method="post">
+                            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                <div style="flex: 1;">
+                                    <label for="newUsername">Nama Pengguna (Username):</label>
+                                    <input type="text" id="newUsername" name="newUsername" required style="width: 100%;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label for="password">Kata Laluan (Password):</label>
+                                    <input type="password" id="newPassword" name="newPassword" required style="width: 100%;">
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                <div style="flex: 1;">
+                                    <label for="category">Kategori Kokurikulum:</label>
+                                    <select id="category" name="category" onchange="updateUnits()" required style="width: 100%; padding: 8px;">
+                                        <option value="Unit Beruniform">Unit Beruniform</option>
+                                        <option value="Kelab & Persatuan">Kelab & Persatuan</option>
+                                        <option value="Sukan & Permainan">Sukan & Permainan</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label for="unit">Unit Ditugaskan:</label>
+                                    <select id="unit" name="unit" required style="width: 100%; padding: 8px;">
+                                        </select>
+                                </div>
+                            </div>
+                    
+                            <button type="submit" class="btn-primary" style="padding: 10px 20px;">Daftar Guru</button>
+                        </form>
+                    </div>
+                    
+                    <div style="background: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                        <div style="margin-bottom: 20px;">
+                            <label for="searchInput"><b>Carian Guru:</b></label>
+                            <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 3)" placeholder="Cari username atau unit..." style="width: 100%; max-width: 400px; display: block; margin-top: 5px;">
+                        </div>
+                            
+                        <table id="table" style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Kategori</th>
+                                <th>Unit Ditugaskan</th>
+                                <th>Tindakan</th>
+                            </tr>
+                            <%
+                                ArrayList<User> supervisorList = UserDAO.getAllSupervisors();
+                                
+                                if(supervisorList == null || supervisorList.isEmpty()) {
+                            %>
+                                <tr><td colspan="5" style="text-align: center; padding: 20px;">Tiada guru penasihat didaftarkan dalam sistem.</td></tr>
+                            <%  } else {
+                                    for (User spv : supervisorList) {
+                            %>
+                                    <tr>
+                                        <td style="text-align: center;"><%= spv.getUserId() %></td>
+                                        <td><b><%= spv.getUsername() %></b></td>
+                                        <td><%= spv.getAssignedCategory() %></td>
+                                        <td><%= spv.getAssignedUnit() %></td>
+                                        <td style="text-align: center;">
+                                            <a href="../DeleteSupervisorServlet?id=<%= spv.getUserId() %>"
+                                               onclick="return confirm('Padam pengguna ini?');"
+                                               class="btn-danger" style="padding: 5px 10px; font-size: 0.9em;">Padam</a>
+                                        </td>
+                                    </tr>
+                            <%
+                                    }
+                                }
+                            %>
+                        </table>
+                    </div>
+                </main>
             </div>
-        </header>
-        
-        <main>
-            <fieldset>
-                <legend>Daftar Guru Baharu</legend>
-                
-                <form action="manage_supervisors.jsp" method="post">
-                    <label for="newUsername">Nama Pengguna:</label>
-                    <input type="text" id="newUsername" name="newUsername" required>
             
-                    <label for="password">Kata Laluan:</label>
-                    <input type="password" id="newPassword" name="newPassword" required>
-                    
-                    <p>
-                        <label for="category">Kategori Kokurikulum:</label>
-                        <select id="category" name="category" onchange="updateUnits()" required style="width: 100%; padding: 5px;">
-                            <option value="Unit Beruniform">Unit Beruniform</option>
-                            <option value="Kelab & Persatuan">Kelab & Persatuan</option>
-                            <option value="Sukan & Permainan">Sukan & Permainan</option>
-                        </select>
-                    </p>
-                    <p>
-                        <label for="unit">Unit Ditugaskan:</label>
-                        <select id="unit" name="unit" required style="width: 100%; padding: 5px;">
-                        </select>
-                    </p>
-            
-                    <button type="submit" class="btn-primary">Daftar Guru</button>
-                </form>
-            
-            <%
-            if ("POST".equalsIgnoreCase(request.getMethod())) {
-                String usernameInput = request.getParameter("newUsername");
-                String passwordInput = request.getParameter("newPassword");
-                String categoryInput = request.getParameter("category");
-                String unitInput = request.getParameter("unit");
-            
-                try {
-                    String hashedPassword = SecurityUtils.hashPassword(passwordInput);
-                    
-                    // SUPERVISOR role in hardcoded
-                    User newUser = new User(0, usernameInput, hashedPassword, "SUPERVISOR", categoryInput, unitInput);
-                    
-                    if (UserDAO.addUser(newUser)) {
-                        out.println("<p class='success-text'>Pendaftaran berjaya! Akaun guru sedia untuk digunakan.</p>");
-                    } else {
-                        out.println("<p class='error-text'>Ralat: Nama pengguna ini telah wujud.</p>");
-                    } 
-                } catch (Exception e) {
-                    out.println("<p class='error-text'>Ralat: " + e.getMessage() + "</p>");
-                } 
-            }
-            %>
-            </fieldset>
-            
-            <fieldset style="margin-bottom: 15px; width: 100%;">
-                <label for="searchInput"><b>Carian Guru:</b></label>
-                <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 3)" placeholder="Cari username...">
-            </fieldset>
-                
-            <fieldset style="width: 100%;">
-                <table id="table">
-                    <caption>Direktori Pengguna Sistem</caption>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Kategori</th>
-                        <th>Unit Ditugaskan</th>
-                        <th>Tindakan</th>
-                    </tr>
-                <%
-                    ArrayList<User> supervisorList = UserDAO.getAllSupervisors();
-                    
-                    for (User spv : supervisorList) {
-                %>
-                        <tr>
-                            <td><%= spv.getUserId() %></td>
-                            <td><%= spv.getUsername() %></td>
-                            <td><%= spv.getAssignedCategory() %></td>
-                            <td><%= spv.getAssignedUnit() %></td>
-                            <td>
-                                <a href="../DeleteSupervisorServlet?id=<%= spv.getUserId() %>"
-                                   onclick="return confirm('Padam pengguna ini?');"
-                                   class="btn-danger">
-                                   Padam
-                                </a>
-                            </td>
-                        </tr>
-                <%
-                    }
-                %>
-                </table>
-            </fieldset>
-        </main>
-            
+        </div>
         <script src="../js/search.js"></script>
     </body>
 </html>

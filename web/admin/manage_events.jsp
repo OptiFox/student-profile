@@ -52,100 +52,115 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="../css/style.css">
-        
-        <title>SPIS - Urus Senarai Acara & Pertandingan</title>
+        <title>SPIS - Pengurusan Acara</title>
     </head>
     <body>
-        <header class="flex">
-            <h1>Sistem Profil Pelajar (SPIS) - Pengurusan Acara & Pertandingan</h1>
+        <div class="dashboard-layout">
             
-            <div>
-                <a href="../admin_dashboard.jsp" class="btn-secondary">Kembali</a>
-                <a href="../logout.jsp" class="btn-danger">Log Keluar</a>
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2>SPIS Admin</h2>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="../admin_dashboard.jsp">Papan Pemuka</a>
+                    <a href="manage_supervisors.jsp">Urus Guru Penasihat</a>
+                    <a href="manage_events.jsp" class="active">Urus Senarai Acara</a>
+                    <a href="add_student.jsp">Daftar Pelajar Baharu</a>
+                    <a href="view_all_students.jsp">Papar Keseluruhan Pelajar</a>
+                    <a href="generate_report.jsp">Penjanaan Laporan</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <a href="../logout.jsp" class="btn-danger">Log Keluar</a>
+                </div>
+            </aside>
+            
+            <div class="main-content">
+                <header class="top-header">
+                    <div>
+                        <h2 style="margin: 0; color: #2c3e50;">Pengurusan Acara & Pertandingan</h2>
+                    </div>
+                    <div>
+                        <a href="../admin_dashboard.jsp" class="btn-secondary">Kembali</a>
+                    </div>
+                </header>
+                
+                <main class="content-body">
+                    <%= alertMessage %>
+                    
+                    <div style="max-width: 800px; background: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 30px;">
+                        <h3 style="margin-top: 0;">Tambah Acara Baharu</h3>
+                        <form action="manage_events.jsp" method="post">
+                            <div style="display: flex; gap: 15px;">
+                                <div style="flex: 2;">
+                                    <label for="eventName">Nama Acara:</label>
+                                    <input type="text" id="eventName" name="eventName" required style="width: 100%;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label for="eventType">Kategori:</label>
+                                    <select id="eventType" name="eventType" required style="width: 100%;">
+                                        <option value="Unit Beruniform">Unit Beruniform</option>
+                                        <option value="Kelab & Persatuan">Kelab & Persatuan</option>
+                                        <option value="Sukan & Permainan">Sukan & Permainan</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <p>
+                                <label for="eventDate">Tarikh:</label>
+                                <input type="date" id="eventDate" name="eventDate" required style="width: 100%;">
+                            </p>
+                            
+                            <p>
+                                <label for="description">Penerangan ringkas:</label>
+                                <textarea id="description" name="description" rows="3" style="width: 100%;"></textarea>
+                            </p>
+                            
+                            <button type="submit" class="btn-primary" style="padding: 10px 20px;">Tambah Acara</button>
+                        </form>
+                    </div>
+                    
+                    <div style="background: white; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                        <div style="margin-bottom: 20px;">
+                            <label for="searchInput"><b>Carian Acara:</b></label>
+                            <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 2)" placeholder="Cari nama acara..." style="width: 100%; max-width: 400px; display: block; margin-top: 5px;">
+                        </div>
+                        
+                        <table id="table" style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama Acara</th>
+                                <th>Kategori</th>
+                                <th>Tarikh</th>
+                                <th>Tindakan</th>
+                            </tr>
+                            <%
+                                if (eventList == null || eventList.isEmpty()) {
+                            %>
+                                    <tr><td colspan="5" style="text-align: center; padding: 20px;">Tiada acara didaftarkan dalam sistem.</td></tr>
+                            <%
+                                } else {
+                                    for (Event e : eventList) {
+                            %>
+                                        <tr>
+                                            <td style="text-align: center;"><%= e.getEventId() %></td>
+                                            <td><%= e.getEventName() %></td>
+                                            <td><%= e.getEventType() %></td>
+                                            <td><%= e.getEventDate() %></td>
+                                            <td style="text-align: center;">
+                                                <a href="../DeleteEventServlet?id=<%= e.getEventId() %>"
+                                                   onclick="return confirm('Padam acara ini?');"
+                                                   class="btn-danger" style="padding: 5px 10px; font-size: 0.9em;">Padam</a>
+                                            </td>
+                                        </tr>
+                            <%
+                                    }
+                                }
+                            %>
+                        </table>
+                    </div>
+                </main>
             </div>
-        </header>
-        
-        <main>
-            <%= alertMessage %>
-            <fieldset>
-                <legend>Tambah Acara Baharu</legend>
-                
-                <form action="manage_events.jsp" method="post">
-                    <p>
-                        <label for="eventName">Nama Acara:</label>
-                        <input type="text" id="eventName" name="eventName" required>
-                    </p>
-            
-                    <p>
-                        <label for="eventType">Kategori:</label>
-                        <select id="eventType" name="eventType" required>
-                            <option value="Unit Beruniform">Unit Beruniform</option>
-                            <option value="Kelab & Persatuan">Kelab & Persatuan</option>
-                            <option value="Sukan & Permainan">Sukan & Permainan</option>
-                        </select>
-                    </p>
-                    
-                    <p>
-                        <label for="eventDate">Tarikh:</label>
-                        <input type="date" id="eventDate" name="eventDate" required>
-                    </p>
-                    
-                    <p>
-                        <label for="description">Penerangan ringkas:</label>
-                        <textarea id="description" name="description" rows="3" style="width: 100%;"></textarea>
-                    </p>
-            
-                    <button type="submit" class="btn-primary">Tambah Acara</button>
-                </form>
-            </fieldset>
-            
-            <br>
-            <fieldset style="margin-bottom: 15px; width: 100%;">
-                <label for="searchInput"><b>Carian Acara:</b></label>
-                <input type="text" id="searchInput" onkeyup="filterTable('searchInput', 'table', 1, 2)" placeholder="Cari nama acara...">
-            </fieldset>
-                
-            <fieldset style="width: 100%;">
-                <table id="table">
-                    <caption>Senarai Keseluruhan Acara & Pertandingan</caption>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama Acara</th>
-                        <th>Kategori</th>
-                        <th>Tarikh</th>
-                        <th>Tindakan</th>
-                    </tr>
-                <%
-                    if (eventList == null || eventList.isEmpty()) {
-                %>
-                        <tr>
-                            <td colspan="5" style="text-align: center;">Tiada acara didaftarkan dalam sistem.</td>
-                        </tr>
-                <%
-                    } else {
-                        for (Event e : eventList) {
-                %>
-                        <tr>
-                            <td><%= e.getEventId() %></td>
-                            <td><%= e.getEventName() %></td>
-                            <td><%= e.getEventType() %></td>
-                            <td><%= e.getEventDate() %></td>
-                            <td>
-                                <a href="../DeleteEventServlet?id=<%= e.getEventId() %>"
-                                   onclick="return confirm('Padam acara ini?');"
-                                   class="btn-danger">
-                                   Padam
-                                </a>
-                            </td>
-                        </tr>
-                <%
-                        }
-                    }
-                %>
-                </table>
-            </fieldset>
-        </main>
-                
+        </div>
         <script src="../js/search.js"></script>
     </body>
 </html>

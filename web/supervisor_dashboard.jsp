@@ -41,7 +41,7 @@
                 <ul class="btn">
                     <li>
                         <a href="supervisor/view_unit_students.jsp">
-                            <button class="btn-primary" style="width: 250px; background-color: #17a2b8;">Senarai Pelajar Unit</button>
+                            <button class="btn-primary" style="width: 250px;">Senarai Pelajar Unit</button>
                         </a>
                     </li>
                     <li>
