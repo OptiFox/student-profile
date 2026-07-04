@@ -5,7 +5,9 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="java.util.ArrayList, java.sql.Date" %>
+<%@page import="com.spis.models.Student, com.spis.models.Attendance" %>
+<%@page import="com.spis.dao.StudentDAO, com.spis.dao.AttendanceDAO" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -16,6 +18,45 @@
         response.sendRedirect("../login.jsp");
         return; 
     }
+    
+    String alertMessage = "";
+
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        String meetDateStr = request.getParameter("meetDate");
+        String activityTitle = request.getParameter("activityTitle");
+        String extraNotes = request.getParameter("extraNotes");
+        String[] studentIds = request.getParameterValues("studentIds");
+
+        if (studentIds != null && studentIds.length > 0) {
+            ArrayList<Attendance> records = new ArrayList<>();
+            Date meetDate = Date.valueOf(meetDateStr);
+
+            for (String idStr : studentIds) {
+                int sId = Integer.parseInt(idStr);
+                String status = request.getParameter("status_" + sId);
+
+                Attendance record = new Attendance();
+                record.setStudentId(sId);
+                record.setUnitName(assignedUnit);
+                record.setMeetDate(meetDate);
+                record.setActivityTitle(activityTitle);
+                record.setExtraNotes(extraNotes);
+                record.setStatus(status);
+
+                records.add(record);
+            }
+
+            try {
+                if (AttendanceDAO.saveAttendanceBatch(records)) {
+                    alertMessage = "<p class='success-text' style='text-align: center; margin-bottom: 15px;'>Rekod kehadiran berjaya disimpan!</p>";
+                }
+            } catch (Exception e) {
+                alertMessage = "<p class='error-text' style='text-align: center; margin-bottom: 15px;'>Ralat Pangkalan Data: " + e.getMessage() + "</p>";
+            }
+        }
+    }
+    
+    ArrayList<Student> studentList = StudentDAO.getStudentsByUnit(assignedUnit);
 %>
 
 <!DOCTYPE html>
@@ -81,40 +122,24 @@
                     </tr>
                     
                     <%
-                        Connection conn = null;
-                        PreparedStatement stmt = null;
-                        ResultSet rs = null;
-                        int counter = 1;
-                        
-                        try {
-                            Class.forName("org.apache.derby.jdbc.ClientDriver");
-                            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                            
-                            String query = "SELECT * FROM Students WHERE uniform_unit = ? OR sport = ? OR club = ? "
-                                    + "ORDER BY grade_year ASC, class_name ASC, student_name ASC";
-
-                            //String query = "SELECT * FROM Students WHERE uniform_unit = 'Pengakap'"; used this for hardcoded test
-                            
-                            stmt = conn.prepareStatement(query);
-                            stmt.setString(1, assignedUnit);
-                            stmt.setString(2, assignedUnit);
-                            stmt.setString(3, assignedUnit);
-                            
-                            rs = stmt.executeQuery();
-                            
-                            boolean foundData = false;
-                            
-                            while (rs.next()) {
-                                foundData = true;
-                                int studentId = rs.getInt("student_id");
+                        if (studentList.isEmpty()) {
+                    %>
+                            <tr>
+                                <td colspan="6" class="error-text" style="text-align: center;">Tiada pelajar dijumpai untuk unit: <%= assignedUnit %></td>
+                            </tr>
+                    <%
+                        } else {
+                            int counter = 1;
+                            for (Student s : studentList) {
+                                int studentId = s.getStudentId();
                     %>
                     
                             <tr>
                                 <td><%= counter++ %></td>
-                                <td><%= rs.getString("student_name") %></td>
-                                <td><%= rs.getString("mykid") %></td>
-                                <td><%= rs.getInt("grade_year") %></td>
-                                <td><%= rs.getString("class_name") %></td>
+                                <td><%= s.getStudentName() %></td>
+                                <td><%= s.getMykid() %></td>
+                                <td><%= s.getGradeYear() %></td>
+                                <td><%= s.getClassName() %></td>
                                 <td>
                                     <!-- This is used to store student ids in an array -->
                                     <input type="hidden" name="studentIds" value="<%= studentId %>">
@@ -128,16 +153,6 @@
                     
                     <%
                             }
-                            
-                            if (!foundData) {
-                                out.println("<tr><td colspan='6' class='error-text'>Tiada pelajar dijumpai untuk unit: " + assignedUnit + "</td></tr>");
-                            }
-                        } catch (Exception e) {
-                            out.println("<tr><td colspan='6' class='error-text'>Ralat: " + e.getMessage() + "</td><tr>");
-                        } finally {
-                            if (rs != null) rs.close();
-                            if (stmt != null) stmt.close();
-                            if (conn != null) conn.close();
                         }
                     %>
                 </table>
@@ -146,53 +161,6 @@
                 
                 <button type="submit" class="btn-primary">Simpan Kehadiran</button>
             </form>
-                
-            <%
-                // batch processing
-                if ("POST".equalsIgnoreCase(request.getMethod())) {
-                    String meetDate = request.getParameter("meetDate");
-                    String activityTitle = request.getParameter("activityTitle");
-                    String extraNotes = request.getParameter("extraNotes");
-                    String[] studentIds = request.getParameterValues("studentIds"); 
-                    
-                    if (studentIds != null && studentIds.length > 0) {
-                        Connection insertConn = null;
-                        PreparedStatement insertStmt = null;
-                        
-                        try {
-                            Class.forName("org.apache.derby.jdbc.ClientDriver");
-
-                            insertConn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-
-                            String insertQuery = "INSERT INTO Attendance (student_id, unit_name, meet_date, activity_title, extra_notes, status) VALUES (?, ?, ?, ?, ?, ?)";
-                            insertStmt = insertConn.prepareStatement(insertQuery);
-                            
-                            for (String idStr : studentIds) {
-                                int sId = Integer.parseInt(idStr);
-                                String status = request.getParameter("status_" + sId);
-                                
-                                insertStmt.setInt(1, sId);
-                                insertStmt.setString(2, assignedUnit);
-                                insertStmt.setDate(3, java.sql.Date.valueOf(meetDate));
-                                insertStmt.setString(4, activityTitle);
-                                insertStmt.setString(5, extraNotes);
-                                insertStmt.setString(6, status);
-                                
-                                insertStmt.addBatch();
-                            }
-
-                            insertStmt.executeBatch();
-                            out.println("<p style='color: green; font-weight: bold; margin-top: 15px; text-align: center;'>Rekod kehadiran berjaya disimpan!</p>");
-                            
-                        } catch (Exception e) {
-                            out.println("<p class='error-text'>Ralat Pangkalan Data: " + e.getMessage() + "</p>");
-                        } finally {
-                            if (insertStmt != null) insertStmt.close();
-                            if (insertConn != null) insertConn.close();
-                        }
-                    }
-                }
-            %>
         </main>
     </body>
 </html>

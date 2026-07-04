@@ -48,6 +48,28 @@ public class AttendanceDAO {
         return list;
     }
     
+    public static boolean saveAttendanceBatch(ArrayList<com.spis.models.Attendance> records) throws Exception {
+        String insertQuery = "INSERT INTO Attendance (student_id, unit_name, meet_date, activity_title, extra_notes, status) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+             
+            for (com.spis.models.Attendance record : records) {
+                stmt.setInt(1, record.getStudentId());
+                stmt.setString(2, record.getUnitName());
+                stmt.setDate(3, record.getMeetDate());
+                stmt.setString(4, record.getActivityTitle());
+                stmt.setString(5, record.getExtraNotes());
+                stmt.setString(6, record.getStatus());
+                
+                stmt.addBatch(); // Queue it up
+            }
+            
+            int[] results = stmt.executeBatch(); // Fire them all at once
+            return results.length > 0;
+        }
+    }
+    
     // delete a specific attendance entry for undo function
     public static boolean deleteAttendance(int attendanceId) {
         String query = "DELETE FROM Attendance WHERE attendance_id = ?";

@@ -39,9 +39,6 @@
         String club = request.getParameter("kelab");
         String sport = request.getParameter("sukan");
         
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        
         try {
             Student student = new Student(studentId, studentName, mykid, gender, race, gradeYear, className, 
                                           uniform, club, sport, "", "", "");
