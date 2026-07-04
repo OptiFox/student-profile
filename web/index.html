@@ -8,83 +8,37 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="css/style.css">
         <title>Laman Utama - SPIS</title>
-        <style>
-            .hero-section {
-                text-align: center;
-                padding: 60px 20px;
-                background-color: #f8f9fa;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            }
-            .hero-section h2 {
-                color: #2c3e50;
-                font-size: 2.2em;
-                margin-bottom: 15px;
-            }
-            .hero-section p {
-                color: #555;
-                font-size: 1.1em;
-                max-width: 600px;
-                margin: 0 auto 30px auto;
-                line-height: 1.6;
-            }
-            .btn-large {
-                padding: 12px 30px;
-                font-size: 1.1em;
-                background-color: #007bff;
-                color: white;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-                transition: background-color 0.3s;
-            }
-            .btn-large:hover {
-                background-color: #0056b3;
-            }
-            .features {
-                display: flex;
-                justify-content: center;
-                gap: 40px;
-                margin-top: 50px;
-                text-align: center;
-            }
-            .feature-box {
-                flex: 1;
-                max-width: 250px;
-                padding: 20px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                background: white;
-            }
-        </style>
     </head>
-    <body>
-        <header class="flex">
-            <h1>Sistem Profil Pelajar (SPIS)</h1>
-        </header>
+    <body class="landing-body">
         
-        <main>
-            <div class="hero-section">
-                <h2>Selamat Datang ke SPIS</h2>
-                <p>Sistem pengurusan bersepadu untuk merekod kehadiran dan pencapaian kokurikulum pelajar, memfokuskan kepada kelancaran proses penilaian PAJSK sekolah.</p>
-                
-                <a href="login.jsp" class="btn-large">Log Masuk Sistem</a>
+        <div class="landing-container">
+            <div class="logo-container">
+                <img src="images/kpm-logo.png" alt="Logo KPM" onerror="this.style.display='none'">
+                <img src="images/logo.png" alt="Logo Sekolah" onerror="this.style.display='none'">
             </div>
-
+            
+            <h2 class="school-name">Sekolah Kebangsaan Zainab 1</h2>
+            
+            <h1>Sistem Profil Pelajar (SPIS)</h1>
+            <p class="subtitle">Platform Pengurusan PAJSK & Kehadiran Bersepadu</p>
+            
             <div class="features">
-                <div class="feature-box">
-                    <h3>Pengurusan Profil</h3>
-                    <p>Urus data pelajar dan guru penasihat dengan mudah dan teratur.</p>
+                <div class="feature-card">
+                    <h3>👨‍🎓 Pengurusan Profil</h3>
+                    <p>Urus pangkalan data pelajar, guru penasihat, dan rekod penempatan unit kokurikulum secara berpusat.</p>
                 </div>
-                <div class="feature-box">
-                    <h3>Rekod Kehadiran</h3>
-                    <p>Jejak kehadiran mingguan untuk unit beruniform, kelab, dan sukan.</p>
+                <div class="feature-card">
+                    <h3>📝 Kehadiran Digital</h3>
+                    <p>Jejak dan rekod kehadiran mingguan pelajar untuk unit beruniform, kelab, persatuan dan sukan dengan pantas.</p>
                 </div>
-                <div class="feature-box">
-                    <h3>Pencapaian PAJSK</h3>
-                    <p>Kira dan jana markah pemarkahan aktiviti kokurikulum secara automatik.</p>
+                <div class="feature-card">
+                    <h3>🏆 Analisis PAJSK</h3>
+                    <p>Kira markah dan jana gred PAJSK secara automatik dan tepat berdasarkan standard penilaian KPM.</p>
                 </div>
             </div>
-        </main>
+            
+            <a href="login.jsp" class="btn-login">Log Masuk Sistem &rarr;</a>
+        </div>
+        
     </body>
 </html>

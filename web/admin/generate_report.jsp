@@ -85,7 +85,7 @@
                                 </div>
                                 
                                 <div style="flex: 1;">
-                                    <label for="year">Kumpulan Sasaran (Darjah):</label>
+                                    <label for="year">Kumpulan Sasaran:</label>
                                     <select name="year" id="year" required style="width: 100%;">
                                         <option value="4" <%= "4".equals(targetYear) ? "selected" : ""%>>Tahun 4</option>
                                         <option value="5" <%= "5".equals(targetYear) ? "selected" : ""%>>Tahun 5</option>
