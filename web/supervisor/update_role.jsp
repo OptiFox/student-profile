@@ -5,7 +5,8 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="java.util.ArrayList" %>
+<%@page import="com.spis.models.Student, com.spis.dao.StudentDAO" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -22,46 +23,21 @@
     String alertMessage = "";
 
     if ("POST".equalsIgnoreCase(request.getMethod())) {
-        String studentIdStr = request.getParameter("studentId");
+        int studentId = Integer.parseInt(request.getParameter("studentId"));
         String newRole = request.getParameter("newRole");
-        
+
         if (assignedCategory == null) {
             alertMessage = "<p class='error-text'>Ralat Sistem: Kategori tidak dijumpai.</p>";
         } else {
-            String columnToUpdate = "";
-            if ("Unit Beruniform".equals(assignedCategory)) {
-                columnToUpdate = "uniform_role";
-            } else if ("Kelab & Persatuan".equals(assignedCategory)) {
-                columnToUpdate = "club_role";
-            } else if ("Sukan & Permainan".equals(assignedCategory)) {
-                columnToUpdate = "sport_role";
-            }
-            
-            if (!columnToUpdate.isEmpty()) {
-                Connection updateConn = null;
-                PreparedStatement updateStmt = null;
-                try {
-                    Class.forName("org.apache.derby.jdbc.ClientDriver");
-                    updateConn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                    
-                    String updateQuery = "UPDATE Students SET " + columnToUpdate + " = ? WHERE student_id = ?";
-                    updateStmt = updateConn.prepareStatement(updateQuery);
-                    updateStmt.setString(1, newRole);
-                    updateStmt.setInt(2, Integer.parseInt(studentIdStr));
-                    
-                    int rowsAffected = updateStmt.executeUpdate();
-                    if (rowsAffected > 0) {
-                        alertMessage = "<p class='success-text'>Jawatan pelajar berjaya dikemaskini!</p>";
-                    }
-                } catch (Exception e) {
-                    alertMessage = "<p class='error-text'>Ralat Pangkalan Data: " + e.getMessage() + "</p>";
-                } finally {
-                    if (updateStmt != null) updateStmt.close();
-                    if (updateConn != null) updateConn.close();
-                }
+            if (StudentDAO.updateStudentRole(studentId, assignedCategory, newRole)) {
+                alertMessage = "<p class='success-text'>Jawatan pelajar berjaya dikemaskini!</p>";
+            } else {
+                alertMessage = "<p class='error-text'>Ralat Pangkalan Data semasa kemaskini.</p>";
             }
         }
     }
+    
+    ArrayList<Student> studentList = StudentDAO.getStudentsByUnit(assignedUnit);
 %>
 
 <!DOCTYPE html>
@@ -91,45 +67,16 @@
                         <select name="studentId" id="studentId" required>
                             <option value="">-- Sila Pilih Pelajar --</option>
                             <%
-                                Connection conn = null;
-                                PreparedStatement stmt = null;
-                                ResultSet rs = null;
-                                
-                                try {
-                                    Class.forName("org.apache.derby.jdbc.ClientDriver");
-                                    conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                                    
-                                    String roleColumn = "uniform_role"; // Default fallback
-                                    if ("Kelab & Persatuan".equals(assignedCategory)) {
-                                        roleColumn = "club_role";
-                                    } else if ("Sukan & Permainan".equals(assignedCategory)) {
-                                        roleColumn = "sport_role";
-                                    }
-                                    
-                                    String query = "SELECT student_id, student_name, class_name, grade_year, " 
-                                            + roleColumn + " AS student_role FROM Students "
-                                            + "WHERE uniform_unit = ? OR club = ? OR sport = ? ORDER BY student_name ASC";
-                                    
-                                    stmt = conn.prepareStatement(query);
-                                    stmt.setString(1, assignedUnit);
-                                    stmt.setString(2, assignedUnit);
-                                    stmt.setString(3, assignedUnit);
-                                    
-                                    rs = stmt.executeQuery();
-                                    
-                                    while(rs.next()) {
+                                for (Student s : studentList) {
+                                    String currentStudentRole = "Ahli Biasa";
+                                    if ("Kelab & Persatuan".equals(assignedCategory)) currentStudentRole = s.getClubRole();
+                                    else if ("Sukan & Permainan".equals(assignedCategory)) currentStudentRole = s.getSportRole();
+                                    else currentStudentRole = s.getUniformRole();
                             %>
-                                        <option value="<%= rs.getInt("student_id") %>" data-role="<%= rs.getString("student_role") %>">
-                                            <%= rs.getString("student_name") %> (<%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %>)
+                                        <option value="<%= s.getStudentId() %>" data-role="<%= currentStudentRole %>">
+                                            <%= s.getStudentName() %> (<%= s.getGradeYear() %> <%= s.getClassName() %>)
                                         </option>
                             <%
-                                    }
-                                } catch (Exception e) {
-                                    out.println("<option value=''>Ralat Pangkalan Data: " + e.getMessage() + "</option>");
-                                } finally {
-                                    if (rs != null) rs.close();
-                                    if (stmt != null) stmt.close();
-                                    if (conn != null) conn.close();
                                 }
                             %>
                         </select>

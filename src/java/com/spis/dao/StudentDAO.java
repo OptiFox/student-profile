@@ -163,4 +163,25 @@ public class StudentDAO {
             return stmt.executeUpdate() > 0;
         }
     }
+    
+    public static boolean updateStudentRole(int studentId, String category, String newRole) {
+        String column = "";
+        if ("Unit Beruniform".equals(category)) column = "uniform_role";
+        else if ("Kelab & Persatuan".equals(category)) column = "club_role";
+        else if ("Sukan & Permainan".equals(category)) column = "sport_role";
+
+        if (column.isEmpty()) return false;
+
+        String query = "UPDATE Students SET " + column + " = ? WHERE student_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+             stmt.setString(1, newRole);
+             stmt.setInt(2, studentId);
+             return stmt.executeUpdate() > 0;
+        } catch (Exception e) {
+             System.out.println("Error updating role: " + e.getMessage());
+             return false;
+        }
+    }
 }

@@ -70,6 +70,28 @@ public class AttendanceDAO {
         }
     }
     
+    public static int[] getAttendanceStats(int studentId) {
+        int[] stats = new int[]{0, 0}; // Index 0 = Total Meets, Index 1 = Total Attended
+        String query = "SELECT COUNT(attendance_id) AS total_meet, "
+                     + "COUNT(CASE WHEN status='Hadir' THEN 1 END) AS total_hadir "
+                     + "FROM Attendance WHERE student_id = ?";
+                     
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+             stmt.setInt(1, studentId);
+             try (ResultSet rs = stmt.executeQuery()) {
+                 if (rs.next()) {
+                     stats[0] = rs.getInt("total_meet");
+                     stats[1] = rs.getInt("total_hadir");
+                 }
+             }
+        } catch (Exception e) {
+             System.out.println("Error fetching attendance stats: " + e.getMessage());
+        }
+        return stats;
+    }
+    
     // delete a specific attendance entry for undo function
     public static boolean deleteAttendance(int attendanceId) {
         String query = "DELETE FROM Attendance WHERE attendance_id = ?";

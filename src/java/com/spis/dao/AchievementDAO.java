@@ -14,6 +14,24 @@ import java.util.ArrayList;
  * @author daniel
  */
 public class AchievementDAO {
+    public static boolean addAchievement(com.spis.models.Achievement achievement) {
+        String query = "INSERT INTO Achievements (student_id, event_id, comp_level, result, recorded_by) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+             stmt.setInt(1, achievement.getStudentId());
+             stmt.setInt(2, achievement.getEventId());
+             stmt.setString(3, achievement.getCompLevel());
+             stmt.setString(4, achievement.getResult());
+             stmt.setString(5, achievement.getRecordedBy());
+             
+             return stmt.executeUpdate() > 0;
+        } catch (Exception e) {
+             System.out.println("Error adding achievement: " + e.getMessage());
+             return false;
+        }
+    }
+    
     // fetch all achievements recorded by supervisors
     public static ArrayList<AchievementLogDTO> getAchievementsByRecorder(String username) {
         ArrayList<AchievementLogDTO> list = new ArrayList<>();

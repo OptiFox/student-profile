@@ -5,7 +5,10 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*, com.spis.utils.PAJSKEngine" %>
+<%@page import="java.util.ArrayList, java.sql.*" %>
+<%@page import="com.spis.models.Student" %>
+<%@page import="com.spis.dao.StudentDAO, com.spis.dao.AttendanceDAO" %>
+<%@page import="com.spis.utils.PAJSKEngine, com.spis.utils.DBConnection" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -16,6 +19,8 @@
         response.sendRedirect("../login.jsp");
         return;
     }
+    
+    ArrayList<Student> studentList = StudentDAO.getStudentsByUnit(assignedUnit);
 %>
 
 <!DOCTYPE html>
@@ -55,86 +60,48 @@
                     </tr>
                     
                     <%
-                        Connection conn = null;
-                        PreparedStatement stmt = null;
-                        ResultSet rs = null;
-                        int counter = 1;
-                        
-                        try {
-                            Class.forName("org.apache.derby.jdbc.ClientDriver");
-                            conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                            
+                        if (studentList.isEmpty()) {
+                            out.println("<tr><td colspan='6' style='text-align:center;'>Tiada pelajar didaftarkan dalam unit ini.</td></tr>");
+                        } else {
                             PAJSKEngine pajsk = new PAJSKEngine();
+                            int counter = 1;
                             
-                            String query = "SELECT * FROM Students WHERE uniform_unit = ? OR club = ? OR sport = ? "
-                                    + "ORDER BY grade_year ASC, class_name ASC, student_name ASC";
-                            
-                            stmt = conn.prepareStatement(query);
-                            stmt.setString(1, assignedUnit);
-                            stmt.setString(2, assignedUnit);
-                            stmt.setString(3, assignedUnit);
-                            
-                            rs = stmt.executeQuery();
-                            boolean hasData = false;
-                            
-                            while (rs.next()) {
-                                hasData = true;
+                            try (Connection conn = DBConnection.getConnection()) {
                                 
-                                int studentId = rs.getInt("student_id");
-                                String roleInThisUnit = "Ahli Biasa";
-                                
-                                if (assignedUnit.equals(rs.getString("uniform_unit"))) roleInThisUnit = rs.getString("uniform_role");
-                                else if (assignedUnit.equals(rs.getString("club"))) roleInThisUnit = rs.getString("club_role");
-                                else if (assignedUnit.equals(rs.getString("sport"))) roleInThisUnit = rs.getString("sport_role");
-                                
-                                int totalMeetings = 0, totalAttended = 0;
-                                
-                                String attQuery = "SELECT COUNT(attendance_id) AS total_meet, "
-                                        + "COUNT(CASE WHEN status='Hadir' THEN 1 END) AS total_hadir "
-                                        + "FROM Attendance WHERE student_id = ?";
-                                
-                                PreparedStatement attStmt = conn.prepareStatement(attQuery);
-                                attStmt.setInt(1, studentId);
-                                
-                                ResultSet attRs = attStmt.executeQuery();
-                                
-                                if (attRs.next()) {
-                                    totalMeetings = attRs.getInt("total_meet");
-                                    totalAttended = attRs.getInt("total_hadir");
-                                }
-                                
-                                attRs.close();
-                                attStmt.close();
-                                
-                                int scoreAttendance = pajsk.getAttendanceScore(totalMeetings, totalAttended);
-                                int scoreRole = pajsk.getRoleScore(rs.getString("uniform_role"), rs.getString("club_role"), rs.getString("sport_role"));
-                                int scoreInvolvement = pajsk.getInvolvementScore(totalAttended);
-                                int scoreAchievement = pajsk.getAchievementScore(conn, studentId);
-                                
-                                int totalScore = scoreAttendance + scoreRole + scoreInvolvement + scoreAchievement;
-                                
-                                String grade = pajsk.getGrade(totalScore);
+                                for (Student s : studentList) {
+                                    // Figure out their role in this specific unit
+                                    String roleInThisUnit = "Ahli Biasa";
+                                    if (assignedUnit.equals(s.getUniformUnit())) roleInThisUnit = s.getUniformRole();
+                                    else if (assignedUnit.equals(s.getClub())) roleInThisUnit = s.getClubRole();
+                                    else if (assignedUnit.equals(s.getSport())) roleInThisUnit = s.getSportRole();
+                                    
+                                    // Fetch Attendance Stats via DAO
+                                    int[] attStats = AttendanceDAO.getAttendanceStats(s.getStudentId());
+                                    int totalMeetings = attStats[0];
+                                    int totalAttended = attStats[1];
+                                    
+                                    // Calculate Scores
+                                    int scoreAttendance = pajsk.getAttendanceScore(totalMeetings, totalAttended);
+                                    int scoreRole = pajsk.getRoleScore(s.getUniformRole(), s.getClubRole(), s.getSportRole());
+                                    int scoreInvolvement = pajsk.getInvolvementScore(totalAttended);
+                                    int scoreAchievement = pajsk.getAchievementScore(conn, s.getStudentId()); // Needs raw conn for now
+                                    
+                                    int totalScore = scoreAttendance + scoreRole + scoreInvolvement + scoreAchievement;
+                                    String grade = pajsk.getGrade(totalScore);
                     %>
                                 <tr>
                                     <td><%= counter++ %></td>
-                                    <td><%= rs.getString("student_name") %></td>
-                                    <td><%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %></td>
+                                    <td><%= s.getStudentName() %></td>
+                                    <td><%= s.getGradeYear() %> <%= s.getClassName() %></td>
                                     <td><b><%= roleInThisUnit != null ? roleInThisUnit : "Ahli Biasa" %></b></td>
                                     <td style="text-align: center;"><%= totalScore %> / 100</td>
                                     <td style="text-align: center; font-weight: bold; color: <%= grade.equals("A") ? "green" : (grade.equals("E") ? "red" : "black") %>;"><%= grade %></td>
                                 </tr>
                     <%
+                                }
+                            } catch (Exception e) {
+                                out.println("<tr><td colspan='6' class='error-text'>Ralat Pengiraan PAJSK: " + e.getMessage() + "</td></tr>");
                             }
-                            
-                            if (!hasData) {
-                                out.println("<tr><td colspan='6' style='text-align:center;'>Tiada pelajar didaftarkan dalam unit ini.</td></tr>");
-                            }
-                        } catch (Exception e) {
-                            out.println("<tr><td colspan='6' class='error-text'>Ralat Pangkalan Data: " + e.getMessage() + "</td></tr>");
-                        } finally {
-                            if (rs != null) rs.close();
-                            if (stmt != null) stmt.close();
-                            if (conn != null) conn.close();
                         }
                     %>   
                 </table>
