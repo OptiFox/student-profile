@@ -5,7 +5,9 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*" %>
+<%@page import="java.util.ArrayList" %>
+<%@page import="com.spis.models.Student, com.spis.models.Event, com.spis.models.Achievement" %>
+<%@page import="com.spis.dao.StudentDAO, com.spis.dao.EventDAO, com.spis.dao.AchievementDAO" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -16,6 +18,35 @@
         response.sendRedirect("../login.jsp");
         return; 
     }
+    
+    String alertMessage = "";
+
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        try {
+            int studentId = Integer.parseInt(request.getParameter("studentId"));
+            int eventId = Integer.parseInt(request.getParameter("eventId"));
+            String compLevel = request.getParameter("compLevel");
+            String result = request.getParameter("result");
+            
+            Achievement achievement = new Achievement();
+            achievement.setStudentId(studentId);
+            achievement.setEventId(eventId);
+            achievement.setCompLevel(compLevel);
+            achievement.setResult(result);
+            achievement.setRecordedBy(currentUser);
+            
+            if (AchievementDAO.addAchievement(achievement)) {
+                alertMessage = "<p class='success-text' style='text-align:center; margin-bottom:15px;'>Pencapaian berjaya direkodkan!</p>";
+            } else {
+                alertMessage = "<p class='error-text' style='text-align:center; margin-bottom:15px;'>Ralat: Gagal menyimpan rekod pencapaian.</p>";
+            }
+        } catch (Exception e) {
+            alertMessage = "<p class='error-text' style='text-align:center; margin-bottom:15px;'>Ralat Sistem: " + e.getMessage() + "</p>";
+        }
+    }
+
+    ArrayList<Student> studentList = StudentDAO.getStudentsByUnit(assignedUnit);
+    ArrayList<Event> eventList = EventDAO.getAllEvents();
 %>
 
 <!DOCTYPE html>
@@ -36,6 +67,8 @@
         </header>
             
         <main>
+            <%= alertMessage %>
+            
             <fieldset>
                 <legend>Borang Log Pencapaian & Pertandingan</legend>
                 
@@ -45,33 +78,15 @@
                         <select name="studentId" id="studentId" required>
                             <option value="">-- Sila Pilih Pelajar --</option>
                             <%
-                                Connection conn = null;
-                                PreparedStatement stmt = null;
-                                PreparedStatement eventStmt = null;
-                                ResultSet rs = null;
-                                ResultSet eventRs = null;
-                                
-                                try {
-                                    Class.forName("org.apache.derby.jdbc.ClientDriver");
-                                    conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                                    
-                                    String query = "SELECT student_id, student_name, class_name, grade_year FROM Students "
-                                            + "WHERE uniform_unit = ? OR club = ? OR sport = ? ORDER BY student_name ASC";
-                                    
-                                    stmt = conn.prepareStatement(query);
-                                    stmt.setString(1, assignedUnit);
-                                    stmt.setString(2, assignedUnit);
-                                    stmt.setString(3, assignedUnit);
-                                    
-                                    rs = stmt.executeQuery();
-                                    
-                                    while (rs.next()) {
+                                if (studentList != null) {
+                                    for (Student s : studentList) {
                             %>
-                                        <option value="<%= rs.getInt("student_id") %>">
-                                            <%= rs.getString("student_name") %> (<%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %>)
+                                        <option value="<%= s.getStudentId() %>">
+                                            <%= s.getStudentName() %> (<%= s.getGradeYear() %> <%= s.getClassName() %>)
                                         </option>
                             <%
                                     }
+                                }
                             %>
                         </select>
                     </p>
@@ -80,28 +95,15 @@
                         <label for="eventId">Pilih Acara / Pertandingan:</label>
                         <select name="eventId" id="eventId" required>
                             <option value="">-- Sila Pilih Acara --</option>
-                            <%
-                                    // fetch events from Admin's table
-                                    String eventQuery = "SELECT event_id, event_name, event_date FROM Events ORDER BY event_date DESC";
-
-                                    eventStmt = conn.prepareStatement(eventQuery);
-                                    eventRs = eventStmt.executeQuery();
-
-                                    while (eventRs.next()) {
+                            <% 
+                                if (eventList != null) {
+                                    for (Event e : eventList) { 
                             %>
-                                        <option value="<%= eventRs.getInt("event_id") %>">
-                                            <%= eventRs.getString("event_name") %> (<%= eventRs.getDate("event_date") %>)
+                                        <option value="<%= e.getEventId() %>">
+                                            <%= e.getEventName() %> (<%= e.getEventDate() %>)
                                         </option>
-                            <%
+                            <% 
                                     }
-                                } catch (Exception e) {
-                                    out.println("<option value=''>Ralat Pangkalan Data: " + e.getMessage() + "</option>");
-                                } finally {
-                                    if (rs != null) rs.close();
-                                    if (eventRs != null) eventRs.close();
-                                    if (stmt != null) stmt.close();
-                                    if (eventStmt != null) eventStmt.close();
-                                    if (conn != null) conn.close();
                                 }
                             %>
                         </select>
@@ -132,43 +134,6 @@
                     
                     <button type="submit" class="btn-primary">Tambah Pencapaian</button>
                 </form>
-                        
-                <%
-                    if ("POST".equalsIgnoreCase(request.getMethod())) {
-                        String studentIdStr = request.getParameter("studentId");
-                        String eventIdStr = request.getParameter("eventId");
-                        String compLevel = request.getParameter("compLevel");
-                        String result = request.getParameter("result");
-                        
-                        Connection insertConn = null;
-                        PreparedStatement insertStmt = null;
-                        
-                        try {
-                            Class.forName("org.apache.derby.jdbc.ClientDriver");
-                            insertConn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                            
-                            String insertQuery = "INSERT INTO Achievements (student_id, event_id, comp_level, result, recorded_by) "
-                                    + "VALUES (?, ?, ?, ?, ?)";
-                            
-                            insertStmt = insertConn.prepareStatement(insertQuery);
-                            insertStmt.setInt(1, Integer.parseInt(studentIdStr));
-                            insertStmt.setInt(2, Integer.parseInt(eventIdStr));
-                            insertStmt.setString(3, compLevel);
-                            insertStmt.setString(4, result);
-                            insertStmt.setString(5, currentUser);
-                            
-                            int rowsAffected = insertStmt.executeUpdate();
-                            if (rowsAffected > 0) {
-                                out.println("<p class='success-text'>Pencapaian berjaya direkodkan!</p>");
-                            }
-                        } catch (Exception e) {
-                            out.println("<p class='error-text'>Ralat Pangkalan Data: " + e.getMessage() + "</p>");
-                        } finally {
-                            if (insertStmt != null) insertStmt.close();
-                            if (insertConn != null) insertConn.close();
-                        }
-                    }
-                %>
             </fieldset>
         </main>
     </body>
