@@ -6,6 +6,16 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.sql.*, com.spis.utils.DBConnection, com.spis.utils.SecurityUtils" %>
+<%
+    // Checks if the user is admin or not (security)
+    String currentUser = (String) session.getAttribute("username");
+    String currentRole = (String) session.getAttribute("userRole");
+    
+    if (currentUser == null || !"ADMIN".equals(currentRole)) {
+        response.sendRedirect("login.jsp");
+        return; // stop page from loading
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>
