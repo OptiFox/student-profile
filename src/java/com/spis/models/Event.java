@@ -33,7 +33,7 @@ public class Event implements Serializable {
     public int getEventId() { return eventId; }
     public String getEventName() { return eventName; }
     public String getEventType() { return eventType; }
-    public java.util.Date getEventDate() { return eventDate; }
+    public Date getEventDate() { return eventDate; }
     public String getDescription() { return description; }
 
     // setters
