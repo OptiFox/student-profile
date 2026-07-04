@@ -67,6 +67,32 @@ public class AchievementDAO {
         return list;
     }
     
+    public static ArrayList<com.spis.dto.AchievementLogDTO> getAchievementsByStudent(int studentId) {
+        ArrayList<com.spis.dto.AchievementLogDTO> list = new ArrayList<>();
+        String query = "SELECT e.event_date, e.event_name, a.comp_level, a.result "
+                     + "FROM Achievements a, Events e "
+                     + "WHERE a.event_id = e.event_id AND a.student_id = ? ORDER BY e.event_date DESC";
+                     
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+            stmt.setInt(1, studentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    com.spis.dto.AchievementLogDTO dto = new com.spis.dto.AchievementLogDTO();
+                    dto.setEventDate(rs.getDate("event_date"));
+                    dto.setEventName(rs.getString("event_name"));
+                    dto.setCompLevel(rs.getString("comp_level"));
+                    dto.setResult(rs.getString("result"));
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching student achievements: " + e.getMessage());
+        }
+        return list;
+    }
+    
     public static boolean deleteAchievement(int achievementId) {
         String query = "DELETE FROM Achievements WHERE achievement_id = ?";
         try (Connection conn = DBConnection.getConnection();

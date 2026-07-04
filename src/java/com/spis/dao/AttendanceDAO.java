@@ -8,6 +8,7 @@ import com.spis.utils.DBConnection;
 import com.spis.dto.AttendanceLogDTO;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -90,6 +91,31 @@ public class AttendanceDAO {
              System.out.println("Error fetching attendance stats: " + e.getMessage());
         }
         return stats;
+    }
+    
+    public static HashMap<String, int[]> getAttendanceSummary(int studentId) {
+        HashMap<String, int[]> map = new HashMap<>();
+        String query = "SELECT unit_name, COUNT(attendance_id) AS total_meet, "
+                     + "COUNT(CASE WHEN status='Hadir' THEN 1 END) AS total_hadir, "
+                     + "COUNT(CASE WHEN status='Tidak Hadir' THEN 1 END) AS total_tidak "
+                     + "FROM Attendance WHERE student_id = ? GROUP BY unit_name";
+                     
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+            stmt.setInt(1, studentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Array indexes: [0] = Total, [1] = Hadir, [2] = Tidak Hadir
+                    map.put(rs.getString("unit_name"), new int[]{
+                        rs.getInt("total_meet"), rs.getInt("total_hadir"), rs.getInt("total_tidak")
+                    });
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching attendance summary: " + e.getMessage());
+        }
+        return map;
     }
     
     // delete a specific attendance entry for undo function

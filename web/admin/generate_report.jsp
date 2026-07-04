@@ -5,7 +5,10 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.sql.*, com.spis.utils.PAJSKEngine" %>
+<%@page import="java.sql.*, java.util.ArrayList" %>
+<%@page import="com.spis.models.Student" %>
+<%@page import="com.spis.dao.StudentDAO, com.spis.dao.AttendanceDAO" %>
+<%@page import="com.spis.utils.PAJSKEngine, com.spis.utils.DBConnection" %>
 
 <%
     String currentUser = (String) session.getAttribute("username");
@@ -66,7 +69,10 @@
                 </form>
             </div>
                             
-            <% if (isReportGenerated) { %>
+            <%
+                if (isReportGenerated) { 
+                    ArrayList<Student> studentList = StudentDAO.getStudentsByYear(Integer.parseInt(targetYear));
+            %>
                 <div id="reportArea">
                     <div class="flex">
                         <h2>Laporan Markah PAJSK Keseluruhan - Tahun <%= targetYear %> (2026)</h2>
@@ -87,82 +93,46 @@
                         </tr>
                         
                         <%
-                            Connection conn = null;
-                            PreparedStatement stmt = null;
-                            ResultSet rs = null;
-                            int counter = 1;
-                            
-                            try {
-                                Class.forName("org.apache.derby.jdbc.ClientDriver");
-                                conn = DriverManager.getConnection("jdbc:derby://localhost:1527/StudentProfileDB", "app", "app");
-                                
+                            if (studentList.isEmpty()) {
+                                out.println("<tr><td colspan='9' style='text-align: center;'>Tiada rekod pelajar untuk Tahun " + targetYear + ".</td></tr>");
+                            } else {
                                 PAJSKEngine pajsk = new PAJSKEngine();
+                                int counter = 1;
                                 
-                                String query = "SELECT * FROM Students WHERE grade_year = ? ORDER BY class_name ASC, student_name ASC";
-                                
-                                stmt = conn.prepareStatement(query);
-                                stmt.setInt(1, Integer.parseInt(targetYear));
-                                
-                                rs = stmt.executeQuery();
-                                
-                                boolean hasData = false;
-                                
-                                while (rs.next()) {
-                                    hasData = true;
-                                    int studentId = rs.getInt("student_id");
-                                    
-                                    int totalMeetings = 0;
-                                    int totalAttended = 0;
-                                    
-                                    String attQuery = "SELECT COUNT(attendance_id) AS total_meet, "
-                                            + "COUNT(CASE WHEN status='Hadir' THEN 1 END) AS total_hadir "
-                                            + "FROM Attendance WHERE student_id = ?";
-                                    
-                                    PreparedStatement attStmt = conn.prepareStatement(attQuery);
-                                    attStmt.setInt(1, studentId);
-                                    
-                                    ResultSet attRs = attStmt.executeQuery();
-                                    
-                                    if (attRs.next()) {
-                                        totalMeetings = attRs.getInt("total_meet");
-                                        totalAttended = attRs.getInt("total_hadir");
-                                    }
-                                    
-                                    attRs.close();
-                                    attStmt.close();
-                                    
-                                    int scoreAttendance = pajsk.getAttendanceScore(totalMeetings, totalAttended);
-                                    int scoreRole = pajsk.getRoleScore(rs.getString("uniform_role"), rs.getString("club_role"), rs.getString("sport_role"));
-                                    int scoreInvolvement = pajsk.getInvolvementScore(totalAttended);
-                                    int scoreAchievement = pajsk.getAchievementScore(conn, studentId);
-                                    
-                                    int totalScore = scoreAttendance + scoreRole + scoreInvolvement + scoreAchievement;
-                                    
-                                    String grade = pajsk.getGrade(totalScore);
+                                // connection for PAJSK Engine
+                                try (Connection conn = DBConnection.getConnection()) {
+                                    for (Student s : studentList) {
+                                        int studentId = s.getStudentId();
+                                        
+                                        int[] attStats = AttendanceDAO.getAttendanceStats(studentId);
+                                        int totalMeetings = attStats[0];
+                                        int totalAttended = attStats[1];
+                                        
+                                        // Calculate PAJSK
+                                        int scoreAttendance = pajsk.getAttendanceScore(totalMeetings, totalAttended);
+                                        int scoreRole = pajsk.getRoleScore(s.getUniformRole(), s.getClubRole(), s.getSportRole());
+                                        int scoreInvolvement = pajsk.getInvolvementScore(totalAttended);
+                                        int scoreAchievement = pajsk.getAchievementScore(conn, studentId); 
+                                        
+                                        int totalScore = scoreAttendance + scoreRole + scoreInvolvement + scoreAchievement;
+                                        String grade = pajsk.getGrade(totalScore);
                         %>
-                                    <tr>
-                                        <td><%= counter++ %></td>
-                                        <td><%= rs.getString("student_name") %></td>
-                                        <td><%= rs.getInt("grade_year") %> <%= rs.getString("class_name") %></td>
-                                        <td><%= scoreAttendance %></td>
-                                        <td><%= scoreRole %></td>
-                                        <td><%= scoreInvolvement %></td>
-                                        <td><%= scoreAchievement %></td>
-                                        <td><b><%= totalScore %></b></td>
-                                        <td><b><%= grade %></b></td>
-                                    </tr>
+                                        <tr>
+                                            <td><%= counter++ %></td>
+                                            <td><%= s.getStudentName() %></td>
+                                            <td><%= s.getGradeYear() %> <%= s.getClassName() %></td>
+                                            <td><%= scoreAttendance %></td>
+                                            <td><%= scoreRole %></td>
+                                            <td><%= scoreInvolvement %></td>
+                                            <td><%= scoreAchievement %></td>
+                                            <td><b><%= totalScore %></b></td>
+                                            <td><b><%= grade %></b></td>
+                                        </tr>
                         <%
+                                    }
+                                } catch (Exception e) {
+                                    out.println("<tr><td colspan='9' class='error-text'>Ralat Pengiraan: " + e.getMessage() + "</td></tr>");
                                 }
-                                
-                                if (!hasData) {
-                                    out.println("<tr><td colspan='9'>Tiada rekod pelajar untuk Tahun " + targetYear + ".</td></tr>");
-                                }
-                            } catch (Exception e) {
-                                out.println("<tr><td colspan='9' class='error-text'>Ralat Pangkalan Data: " + e.getMessage() + "</td></tr>");
-                            } finally {
-                                if (rs != null) rs.close();
-                                if (stmt != null) stmt.close();
-                                if (conn != null) conn.close();
                             }
                         %>
                     </table>

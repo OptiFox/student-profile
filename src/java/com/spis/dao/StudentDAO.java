@@ -142,6 +142,31 @@ public class StudentDAO {
         return list;
     }
     
+    public static ArrayList<Student> getStudentsByYear(int year) {
+        ArrayList<Student> list = new ArrayList<>();
+        String query = "SELECT * FROM Students WHERE grade_year = ? ORDER BY class_name ASC, student_name ASC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+             
+            stmt.setInt(1, year);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Student(
+                        rs.getInt("student_id"), rs.getString("student_name"), rs.getString("mykid"),
+                        rs.getString("gender"), rs.getString("race"), rs.getInt("grade_year"),
+                        rs.getString("class_name"), rs.getString("uniform_unit"), rs.getString("club"),
+                        rs.getString("sport"), rs.getString("uniform_role"), rs.getString("club_role"),
+                        rs.getString("sport_role")
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching students by year: " + e.getMessage());
+        }
+        return list;
+    }
+    
     public static boolean updateStudent(Student student) throws Exception {
         String query = "UPDATE Students SET student_name = ?, mykid = ?, gender = ?, race = ?, grade_year = ?, "
                      + "class_name = ?, uniform_unit = ?, club = ?, sport = ? WHERE student_id = ?";
