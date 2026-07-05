@@ -131,7 +131,7 @@
                                 <th>Nama Acara</th>
                                 <th>Kategori</th>
                                 <th>Tarikh</th>
-                                <th>Tindakan</th>
+                                <th style="text-align: center;">Tindakan</th>
                             </tr>
                             <%
                                 if (eventList == null || eventList.isEmpty()) {

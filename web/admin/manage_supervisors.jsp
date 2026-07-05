@@ -131,7 +131,7 @@
                                 <th>Username</th>
                                 <th>Kategori</th>
                                 <th>Unit Ditugaskan</th>
-                                <th>Tindakan</th>
+                                <th style="text-align: center;">Tindakan</th>
                             </tr>
                             <%
                                 ArrayList<User> supervisorList = UserDAO.getAllSupervisors();

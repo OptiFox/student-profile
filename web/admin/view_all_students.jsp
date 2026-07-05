@@ -72,8 +72,8 @@
                                 <th style="width: 5%;">Bil.</th>
                                 <th style="width: 30%;">Nama Penuh</th>
                                 <th style="width: 15%;">No. MyKid</th>
-                                <th style="width: 10%;">Tahun</th>
-                                <th style="width: 15%;">Kelas</th>
+                                <th style="width: 10%; text-align: center;">Tahun</th>
+                                <th style="width: 15%; text-align: center;">Kelas</th>
                                 <th style="width: 25%; text-align: center;">Tindakan</th>
                             </tr>
                             <%  if (list.isEmpty()) { %>
