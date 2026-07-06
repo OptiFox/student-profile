@@ -131,7 +131,7 @@
                             </div>
                             
                             <p>
-                                <label for="extraNotes">Catatan Tambahan / Aktiviti (Pilihan):</label>
+                                <label for="extraNotes">Catatan Tambahan:</label>
                                 <textarea id="extraNotes" name="extraNotes" rows="2" placeholder="Contoh: Latihan kawad kaki persediaan hari sukan..." style="width: 100%;"></textarea>
                             </p>
                         </div>
